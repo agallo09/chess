@@ -12,6 +12,8 @@ public class ChessPiece {
     private ChessGame.TeamColor color;
     private PieceType type;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.color = pieceColor;
+        this.type = type;
     }
 
     /**
@@ -48,7 +50,16 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
+        int y = myPosition.getRow();
+        int x =myPosition.getColumn();
+        ArrayList<> newBoard = board.getPiece(myPosition);
+        switch (type){
+            case BISHOP:
+                return BishopMoves(int y,int x, ArrayList newBoard);
+                break;
+        }
+    }
+    private ArrayList<> BishopMoves(int y, int x , ArrayList newBoard){
 
     }
 }
