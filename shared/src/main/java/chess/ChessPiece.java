@@ -48,7 +48,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return color;
     }
 
     /**
@@ -68,20 +68,30 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         switch (type) {
             case BISHOP:
-                return bishopMoves(myPosition.getRow(),myPosition.getColumn());
+                return bishopMoves(myPosition.getRow(),myPosition.getColumn(), board, myPosition);
             default:
                 return new ArrayList<ChessMove>();
 
         }
     }
-    private ArrayList<ChessMove> bishopMoves(int row, int col){
+    private ArrayList<ChessMove> bishopMoves(int row, int col, ChessBoard board,ChessPosition myPosition){
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
 
         // up right diagonal
         int upRow = row + 1;
         int rightCol = col +1 ;
         while (upRow<=8  && rightCol<= 8){
-            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, rightCol),null));
+            ChessPiece piece = board.getPiece(new ChessPosition(upRow,rightCol));
+            ChessPiece mypiece = board.getPiece(myPosition);
+            if (piece==null ){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, rightCol),null));
+            } else if(piece.getTeamColor() != mypiece.getTeamColor() ){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, rightCol),null));
+                break;
+            }else{
+                break;
+            }
+
             upRow ++;
             rightCol++;
         }
@@ -90,7 +100,16 @@ public class ChessPiece {
         // we use upRow
         int leftCol = col -1;
         while (upRow<=8  && leftCol>=1){
-            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, leftCol),null));
+            ChessPiece piece = board.getPiece(new ChessPosition(upRow,leftCol));
+            ChessPiece mypiece = board.getPiece(myPosition);
+            if (piece==null ){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, leftCol),null));
+            } else if(piece.getTeamColor() !=mypiece.getTeamColor() ){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, leftCol),null));
+                break;
+            }else{
+                break;
+            }
             upRow ++;
             leftCol--;
         }
@@ -98,7 +117,16 @@ public class ChessPiece {
         int downRow = row-1;
         leftCol = col-1;
         while (downRow>=1  && leftCol>=1){
-            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, leftCol),null));
+            ChessPiece piece = board.getPiece(new ChessPosition(downRow,leftCol));
+            ChessPiece mypiece = board.getPiece(myPosition);
+            if (piece == null ){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, leftCol),null));
+            } else if(piece.getTeamColor()!=mypiece.getTeamColor() ){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, leftCol),null));
+                break;
+            }else{
+                break;
+            }
             downRow --;
             leftCol--;
         }
@@ -107,7 +135,16 @@ public class ChessPiece {
         // we use right Col
         rightCol = col +1 ;
         while (downRow>=1  && rightCol<=8){
-            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, rightCol),null));
+            ChessPiece piece = board.getPiece(new ChessPosition(downRow,rightCol));
+            ChessPiece mypiece = board.getPiece(myPosition);
+            if (piece == null){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, rightCol),null));
+            } else if(piece.getTeamColor()!= mypiece.getTeamColor() ){
+                moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, rightCol),null));
+                break;
+            }else{
+                break;
+            }
             downRow --;
             rightCol++;
         }
