@@ -65,14 +65,14 @@ public class ChessBoard {
         }
 
         //add WHITE pieces
-            addPiece(new ChessPosition(1,1) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
-            addPiece(new ChessPosition(1,2) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
-            addPiece(new ChessPosition(1,3) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
-            addPiece(new ChessPosition(1,4) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
-            addPiece(new ChessPosition(1,5) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
-            addPiece(new ChessPosition(1,6) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
-            addPiece(new ChessPosition(1,7) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
-            addPiece(new ChessPosition(1,8) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(1,1) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(1,2) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(1,3) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(1,4) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(1,5) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(1,6) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(1,7) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(1,8) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
 
         for (int col = 1; col <= 8; col ++){
             addPiece(new ChessPosition(2,col) , new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
