@@ -15,7 +15,6 @@ public class ChessPiece {
         this.color = pieceColor  ;
         this.type = type  ;
     }
-
     /**
      * The various different chess piece options
      */
@@ -50,16 +49,54 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        int y = myPosition.getRow();
-        int x =myPosition.getColumn();
-        ArrayList<> newBoard = board.getPiece(myPosition);
-        switch (type){
+        switch (type) {
             case BISHOP:
-                return BishopMoves(int y,int x, ArrayList newBoard);
-                break;
+                return bishopMoves(myPosition.getRow(),myPosition.getColumn());
+            default:
+                return new ArrayList<ChessMove>();
+
         }
     }
-    private ArrayList<> BishopMoves(int y, int x , ArrayList newBoard){
+    private ArrayList<ChessMove> bishopMoves(int row, int col){
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+
+        // up right diagonal
+        int upRow = row + 1;
+        int rightCol = col +1 ;
+        while (upRow<=8  && rightCol<= 8){
+            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, rightCol),null));
+            upRow ++;
+            rightCol++;
+        }
+        //up left diagonal
+        upRow = row + 1;
+        // we use upRow
+        int leftCol = col -1;
+        while (upRow<=8  && leftCol>=1){
+            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(upRow, leftCol),null));
+            upRow ++;
+            leftCol--;
+        }
+        //left down diagonal
+        int downRow = row-1;
+        leftCol = col-1;
+        while (downRow>=1  && leftCol>=1){
+            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, leftCol),null));
+            downRow --;
+            leftCol--;
+        }
+        //right down diagonal
+        downRow = row -1;
+        // we use right Col
+        rightCol = col +1 ;
+        while (downRow>=1  && rightCol<=8){
+            moves.add(new ChessMove(new ChessPosition(row, col), new ChessPosition(downRow, rightCol),null));
+            downRow --;
+            rightCol++;
+        }
+
+        return moves;
+    }
 
     }
-}
+
