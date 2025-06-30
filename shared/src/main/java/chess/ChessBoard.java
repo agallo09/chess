@@ -17,17 +17,24 @@ public class ChessBoard {
         if (!(o instanceof ChessBoard that)) {
             return false;
         }
-        return Arrays.equals(squares, that.squares);
+        return Arrays.deepEquals(squares, that.squares);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(squares);
+        return Arrays.deepHashCode(squares);
     }
 
     private ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
         
+    }
+
+    @Override
+    public String toString() {
+        return "ChessBoard{" +
+                "squares=" + Arrays.toString(squares) +
+                '}';
     }
 
     /**
