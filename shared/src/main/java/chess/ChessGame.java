@@ -1,5 +1,6 @@
 package chess;
-
+import chess.ChessMove;
+import chess.ChessPosition;
 import java.util.Collection;
 
 /**
@@ -10,16 +11,15 @@ import java.util.Collection;
  */
 public class ChessGame {
     private ChessBoard board;
-
+    private TeamColor Team;
     public ChessGame() {
-
     }
-
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+
+        return Team;
     }
 
     /**
@@ -28,7 +28,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+       this.Team = team;
     }
 
     /**
@@ -38,6 +38,21 @@ public class ChessGame {
         WHITE,
         BLACK
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Gets a valid moves for a piece at the given location
@@ -57,7 +72,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition startPosition = move.getStartPosition();
+        Collection<ChessMove> moves = validMoves(startPosition);
+
+
     }
 
     /**
@@ -67,7 +85,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ;
     }
 
     /**
@@ -90,6 +108,18 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Sets this game's chessboard with a given board
