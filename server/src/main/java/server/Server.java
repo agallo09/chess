@@ -1,4 +1,5 @@
 package server;
+import service.*;
 import dataaccess.*;
 import spark.*;
 
@@ -8,8 +9,9 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-
         // Register your endpoints and handle exceptions here.
+
+
         Spark.post("/user", new registrationHandler());
         Spark.post("/session", new loginHandler());
         Spark.delete("/session", new logoutHandler());
