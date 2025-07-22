@@ -14,7 +14,7 @@ public class Server {
         DAOauthToken tokenDAO = new DAOauthToken();
         DAOuserData userDAO = new DAOuserData();
         UserService userService = new UserService(userDAO, tokenDAO);
-        GameService gameService = new GameService(tokenDAO);
+        GameService gameService = new GameService(tokenDAO, gameDAO);
         authService authService = new authService(tokenDAO);
 
         // Register your endpoints and handle exceptions here.
@@ -22,7 +22,7 @@ public class Server {
         Spark.post("/session", new loginHandler(userService));
         Spark.delete("/session", new logoutHandler(authService));
         Spark.get("/game", new listGamesHandler(gameService));
-        Spark.post("/game", new createGameHandler(authService, gameService ));
+        Spark.post("/game", new createGameHandler(authService, gameService));
         Spark.put("/game", new joinGameHandler());
 
 

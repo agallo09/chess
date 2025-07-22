@@ -18,10 +18,12 @@ public class DAOauthToken {
             return ;
         }
     }
-    public AuthData find(AuthData token) throws DataAccessException {
+    public Object getAuth(AuthData token) throws DataAccessException {
         String tokenToken = token.authToken();
         if (auth.containsKey(tokenToken)) {
-            throw new DataAccessException("User not found");
+            return token;
         }
+        return null;
     }
+
 }

@@ -17,9 +17,9 @@ public class logoutHandler implements Route {
     @Override
     public Object handle(Request request, Response response) throws Exception {
         Gson gson = new Gson();
-        String jsonString = request.body();
+        String jsonString = request.headers("authorization");
         AuthData user = gson.fromJson(jsonString, AuthData.class);
-        AuthData token = authService.logout(user);
-        return gson.toJson(token);
+        String logoutResult = authService.logout(user);
+        return gson.toJson(logoutResult);
     }
 }

@@ -1,8 +1,8 @@
 package service;
 
 import dataaccess.DAOauthToken;
+import dataaccess.DataAccessException;
 import model.AuthData;
-import model.UserData;
 
 public class authService {
     private final DAOauthToken tokenDAO;
@@ -12,11 +12,16 @@ public class authService {
         this.tokenDAO =token;
     }
 
-    public AuthData logout(AuthData user) {
-        String token = user.authToken();
-
-        //check the
+    public String logout(AuthData user) throws DataAccessException {
+        Object userData = tokenDAO.getAuth(user);
+        if(userData == null){
+            throw new DataAccessException("Unathorized");
+        }
+        //convert object to AuthData object
+        AuthData newAuthData = (AuthData) userData;
+        // delete auth data
+        String token = newAuthData.authToken();
         tokenDAO.deleteAuthInfo(token);
-        return null;
+        return "{}";
     }
 }

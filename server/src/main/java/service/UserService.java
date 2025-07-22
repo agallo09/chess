@@ -19,41 +19,42 @@ public class UserService {
         String username = user.username();
         String password = user.password();
 
-        UserData userdata = null;
-        try {
-            userdata = userDAO.findUser(username);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        //check if user exists
+        Object userData = userDAO.getUser(user);
+        if(userData == null){
+            throw new DataAccessException("Username does not exists");
         }
-
-        if (userdata == null) {
-            throw new DataAccessException("Error: user doesnt exist");
-        }
-
+        //convert object to UserData object
+        UserData newUserData = (UserData) userData;
         // Check password match
-        if (!userdata.password().equals(password)) {
-            throw new DataAccessException("Error: password doesnt match username");
+        if (!newUserData.password().equals(password)) {
+            throw new DataAccessException("Error: password does not match username");
         }
-
-        // Generate token (dummy example, you'd use something more secure in production)
+        //after checking create auth token
         String token = java.util.UUID.randomUUID().toString();
         //add info to authDAO map
         AuthData tokens = new AuthData(token, user.username());
         tokenDAO.createAuth(tokens);
+        //Returning log in result
         return new AuthData(token, username);
     }
 
     public AuthData register(UserData user) throws DataAccessException {
         String username = user.username();
         UserData userdata = null;
-
-        //check and add the user object to the map
+        //check if user exists
+        Object userData = userDAO.getUser(user);
+        if(userData != null){
+            throw new DataAccessException("Username already exists");
+        }
+        //create user
         userDAO.createUser(user);
         // Generate token (dummy example, you'd use something more secure in production)
         String token = java.util.UUID.randomUUID().toString();
-        //add info to authDAO map
+        //add AuthData
         AuthData tokens = new AuthData(token, user.username());
         tokenDAO.createAuth(tokens);
+        //register result return
         return new AuthData(token, username);
     }
 }
