@@ -29,8 +29,8 @@ public class joinGameHandler implements Route {
         String jsonHeader = request.headers("authorization");
         AuthData authData = gson.fromJson(jsonHeader, AuthData.class);
         // service method
-        GameData createResult = gameService.create(authData, gameID);
+        String joinResult = gameService.join(authData, gameID);
         // only display gameID
-        return gson.toJson(createResult.gameID());
+        return joinResult;
     }
 }

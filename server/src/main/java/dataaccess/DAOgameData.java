@@ -14,8 +14,8 @@ public class DAOgameData {
         games.put(gameID,game);
         return game;
     }
-    public GameData getGame(int id) {
-        return games.get(id);
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
     }
 
     public void clear() {
@@ -25,5 +25,10 @@ public class DAOgameData {
 
     public Map<Integer, GameData> list() {
         return games;
+    }
+
+    public String checkColor(GameData game) {
+        GameData gameData = games.get(game.gameID());
+        if (game.!= null)
     }
 }

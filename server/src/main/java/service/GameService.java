@@ -34,4 +34,25 @@ public class GameService {
         }
         return gameDAO.list();
     }
+
+    public String join(AuthData authData, GameData game) throws DataAccessException {
+        //check if authToken exists
+        Object userData = tokenDAO.getAuth(authData);
+        if(userData == null){
+            throw new DataAccessException("Unathorized");
+        }
+        // check if game exists
+        GameData gameData =  gameDAO.getGame(game.gameID());
+        if(gameData == null){
+            throw new DataAccessException("Bad Request");
+        }
+        // check if color is already taken
+        String gameDataColor =  gameDAO.checkColor(game);
+        if(gameData != null){
+            throw new DataAccessException("Bad Request");
+        }
+
+
+
+    }
 }
