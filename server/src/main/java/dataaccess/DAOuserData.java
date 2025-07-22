@@ -1,3 +1,4 @@
+package dataaccess;
 import model.UserData;
 import java.util.HashMap;
 import java.util.Map;
@@ -5,6 +6,10 @@ import java.util.Map;
 public class DAOuserData {
 
     private final Map<String, UserData> users = new HashMap<>();
+
+    //constructor
+    public DAOuserData(){}
+    //nothing much especific
 
     // Create a new user
     public void createUser(UserData user) throws DataAccessException {
@@ -23,11 +28,6 @@ public class DAOuserData {
         return user;
     }
 
-    // Check if a user exists
-    public boolean userExists(String username) {
-        return users.containsKey(username);
-    }
-
     // Clear all users (e.g. for testing or reset endpoint)
     public void clear() {
         users.clear();
@@ -37,4 +37,5 @@ public class DAOuserData {
     public int countUsers() {
         return users.size();
     }
+
 }
