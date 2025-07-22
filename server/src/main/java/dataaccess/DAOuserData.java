@@ -39,4 +39,9 @@ public class DAOuserData {
         }
         return user;
         }
+
+    public String getUsername(String s) {
+        UserData userInfo = users.get(s);
+        return userInfo.username();
+    }
     }

@@ -1,19 +1,24 @@
 package service;
 import dataaccess.DAOauthToken;
 import dataaccess.DAOgameData;
+import dataaccess.DAOuserData;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
+import model.JoinRequest;
+
 
 import java.util.Map;
 
 public class GameService {
     private DAOauthToken tokenDAO;
     private DAOgameData gameDAO;
-    public GameService(DAOauthToken tokenDAO, DAOgameData gameDAO) {
+    private DAOuserData userDAO;
+    public GameService(DAOauthToken tokenDAO, DAOgameData gameDAO, DAOuserData userDAO) {
 
         this.tokenDAO = tokenDAO;
         this.gameDAO = gameDAO;
+        this.userDAO = userDAO;
     }
 
     public GameData create(AuthData jsonHeader, GameData gameID) throws DataAccessException{
@@ -35,24 +40,27 @@ public class GameService {
         return gameDAO.list();
     }
 
-    public String join(AuthData authData, GameData game) throws DataAccessException {
+    public String join(AuthData authData, JoinRequest join) throws DataAccessException {
         //check if authToken exists
         Object userData = tokenDAO.getAuth(authData);
         if(userData == null){
             throw new DataAccessException("Unathorized");
         }
         // check if game exists
-        GameData gameData =  gameDAO.getGame(game.gameID());
+        GameData gameData =  gameDAO.getGame(join.gameID());
         if(gameData == null){
             throw new DataAccessException("Bad Request");
         }
+        // get the username
+        String username = userDAO.getUsername(authData.authToken());
+
         // check if color is already taken
-        String gameDataColor =  gameDAO.checkColor(game);
-        if(gameData != null){
-            throw new DataAccessException("Bad Request");
+        String gameDataColor =  gameDAO.checkColor(join.gameID(), join.playerColor());
+        if(gameDataColor != null){
+            throw new DataAccessException("Already Taken");
         }
-
-
-
+        //update game
+        gameDAO.updateGame(join, username);
+        return ("{}");
     }
 }

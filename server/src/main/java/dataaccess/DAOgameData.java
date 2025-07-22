@@ -2,6 +2,7 @@ package dataaccess;
 import java.util.HashMap;
 import java.util.Map;
 import model.GameData;
+import model.JoinRequest;
 
 public class DAOgameData {
     private final Map<Integer, GameData> games = new HashMap<>();
@@ -27,8 +28,28 @@ public class DAOgameData {
         return games;
     }
 
-    public String checkColor(GameData game) {
-        GameData gameData = games.get(game.gameID());
-        if (game.!= null)
+    public String checkColor(int ID, String color) {
+        GameData gameData = games.get(ID);
+        switch(color){
+            case "WHITE":
+                if (gameData.whiteUsername() != null){
+                    return null;
+                }
+            case "BLACK":
+                if (gameData.blackUsername() != null){
+                    return null;
+                }
+        }
+        return color;
     }
-}
+
+    public void updateGame(JoinRequest join, String username) {
+        GameData gameData = games.get(join.gameID());
+        switch(join.playerColor()){
+            case "WHITE":
+                games.put(join.gameID(), new GameData(join.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game()));
+            case "BLACK":
+                games.put(join.gameID(), new GameData(join.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game()));
+                }
+        }
+    }

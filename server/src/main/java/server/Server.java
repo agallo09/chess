@@ -14,7 +14,7 @@ public class Server {
         DAOauthToken tokenDAO = new DAOauthToken();
         DAOuserData userDAO = new DAOuserData();
         UserService userService = new UserService(userDAO, tokenDAO);
-        GameService gameService = new GameService(tokenDAO, gameDAO);
+        GameService gameService = new GameService(tokenDAO, gameDAO, userDAO);
         authService authService = new authService(tokenDAO);
 
         // Register your endpoints and handle exceptions here.

@@ -3,12 +3,12 @@ package server;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import model.JoinRequest;
 import service.GameService;
 import service.authService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
 import java.util.Map;
 
 public class joinGameHandler implements Route {
@@ -24,12 +24,12 @@ public class joinGameHandler implements Route {
         Gson gson = new Gson();
         // body
         String jsonBody = request.body();
-        GameData gameID = gson.fromJson(jsonBody, GameData.class);
+        JoinRequest joinRequest = gson.fromJson(jsonBody, JoinRequest.class);
         // header
         String jsonHeader = request.headers("authorization");
         AuthData authData = gson.fromJson(jsonHeader, AuthData.class);
         // service method
-        String joinResult = gameService.join(authData, gameID);
+        String joinResult = gameService.join(authData, joinRequest);
         // only display gameID
         return joinResult;
     }
