@@ -23,7 +23,8 @@ public class Server {
         Spark.delete("/session", new logoutHandler(authService));
         Spark.get("/game", new listGamesHandler(gameService));
         Spark.post("/game", new createGameHandler(authService, gameService));
-        Spark.put("/game", new joinGameHandler());
+        Spark.put("/game", new joinGameHandler(authService, gameService));
+
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
