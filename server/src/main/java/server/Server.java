@@ -10,12 +10,14 @@ public class Server {
         Spark.staticFiles.location("web");
 
         //Initialize objects for the DAOs and services so i dont have to create them inside classes
+
         DAOgameData gameDAO = new DAOgameData();
         DAOauthToken tokenDAO = new DAOauthToken();
         DAOuserData userDAO = new DAOuserData();
         UserService userService = new UserService(userDAO, tokenDAO);
         GameService gameService = new GameService(tokenDAO, gameDAO, userDAO);
         authService authService = new authService(tokenDAO);
+
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", new registrationHandler(userService));
@@ -24,6 +26,7 @@ public class Server {
         Spark.get("/game", new listGamesHandler(gameService));
         Spark.post("/game", new createGameHandler(authService, gameService));
         Spark.put("/game", new joinGameHandler(authService, gameService));
+        Spark.delete("/db", new ClearHandler(userService, gameService, authService));
 
 
 

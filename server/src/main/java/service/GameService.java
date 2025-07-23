@@ -6,6 +6,7 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
+import spark.Request;
 
 
 import java.util.Map;
@@ -21,12 +22,17 @@ public class GameService {
         this.userDAO = userDAO;
     }
 
-    public GameData create(AuthData jsonHeader, GameData gameID) throws DataAccessException{
+    public GameData create( AuthData jsonHeader, GameData gameID) throws DataAccessException{
         //check if authToken exists
-        Object userData = tokenDAO.getAuth(jsonHeader);
-        if(userData == null){
-            throw new DataAccessException("Unathorized");
+        Object token = tokenDAO.getAuth(jsonHeader);
+        if(token == null ){
+            throw new DataAccessException("Error: unauthorized");
         }
+        //bad request
+        if (gameID.gameName() == null || gameID.gameName().isBlank()){
+            throw new DataAccessException("Error: bad request");
+        }
+
         //create and return game
         return gameDAO.createGame(gameID);
     }
@@ -42,25 +48,28 @@ public class GameService {
 
     public String join(AuthData authData, JoinRequest join) throws DataAccessException {
         //check if authToken exists
-        Object userData = tokenDAO.getAuth(authData);
-        if(userData == null){
-            throw new DataAccessException("Unathorized");
+        Object token = tokenDAO.getAuth(authData);
+        if(token == null ){
+            throw new DataAccessException("Error: unauthorized");
         }
-        // check if game exists
-        GameData gameData =  gameDAO.getGame(join.gameID());
-        if(gameData == null){
-            throw new DataAccessException("Bad Request");
+        // bad request
+        if(join.playerColor()==null||join.gameID()<1 ){
+            throw new DataAccessException("Error: bad request");
         }
         // get the username
-        String username = userDAO.getUsername(authData.authToken());
+        String username = tokenDAO.getUsername(authData.authToken());
 
         // check if color is already taken
         String gameDataColor =  gameDAO.checkColor(join.gameID(), join.playerColor());
         if(gameDataColor != null){
-            throw new DataAccessException("Already Taken");
+            throw new DataAccessException("Error: already taken");
         }
         //update game
         gameDAO.updateGame(join, username);
         return ("{}");
+    }
+
+    public void clear() {
+        gameDAO.clear();
     }
 }

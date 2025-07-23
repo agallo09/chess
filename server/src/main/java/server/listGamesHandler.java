@@ -20,7 +20,7 @@ public class listGamesHandler implements Route {
     public Object handle(Request request, Response response) throws Exception {
         Gson gson = new Gson();
         String jsonString = request.headers("authorization");
-        AuthData user = gson.fromJson(jsonString, AuthData.class);
+        AuthData user = new AuthData(jsonString, null);
         Map<Integer, GameData> games = gameService.list(user);
         return gson.toJson(games);
     }

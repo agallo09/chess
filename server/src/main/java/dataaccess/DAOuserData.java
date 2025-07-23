@@ -25,11 +25,6 @@ public class DAOuserData {
         users.clear();
     }
 
-    // For debug/logging
-    public int countUsers() {
-        return users.size();
-    }
-    // Find a user by username
 
     public Object getUser(UserData user) {
         String username = user.username();
@@ -40,8 +35,12 @@ public class DAOuserData {
         return user;
         }
 
-    public String getUsername(String s) {
-        UserData userInfo = users.get(s);
-        return userInfo.username();
+
+    public boolean validate(UserData user) {
+        UserData mapUser = users.get(user.username());
+        if (mapUser == null){
+            return false;
+        }
+        return mapUser.password().equals(user.password());
     }
-    }
+}

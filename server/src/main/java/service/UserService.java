@@ -18,17 +18,14 @@ public class UserService {
     public AuthData login(UserData user) throws DataAccessException {
         String username = user.username();
         String password = user.password();
-
-        //check if user exists
-        Object userData = userDAO.getUser(user);
-        if(userData == null){
-            throw new DataAccessException("Username does not exists");
+        //check for a bad request
+        if(user.username() == null || user.password() == null){
+            throw new DataAccessException("Error: bad request");
         }
-        //convert object to UserData object
-        UserData newUserData = (UserData) userData;
+        boolean check = userDAO.validate(user);
         // Check password match
-        if (!newUserData.password().equals(password)) {
-            throw new DataAccessException("Error: password does not match username");
+        if (!check) {
+            throw new DataAccessException("Error: unauthorized");
         }
         //after checking create auth token
         String token = java.util.UUID.randomUUID().toString();
@@ -42,10 +39,14 @@ public class UserService {
     public AuthData register(UserData user) throws DataAccessException {
         String username = user.username();
         UserData userdata = null;
+        //check for a bad request
+        if(user.username() == null || user.password() == null){
+            throw new DataAccessException("Error: bad request");
+        }
         //check if user exists
         Object userData = userDAO.getUser(user);
         if(userData != null){
-            throw new DataAccessException("Username already exists");
+            throw new DataAccessException("Error: already taken");
         }
         //create user
         userDAO.createUser(user);
@@ -56,5 +57,9 @@ public class UserService {
         tokenDAO.createAuth(tokens);
         //register result return
         return new AuthData(token, username);
+    }
+
+    public void clear() {
+        userDAO.clear();
     }
 }

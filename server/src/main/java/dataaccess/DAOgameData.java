@@ -11,10 +11,11 @@ public class DAOgameData {
     public GameData createGame(GameData game) {
         //new id number just by adding one
         int gameId = nextId++;
-        int gameID = game.gameID();
-        games.put(gameID,game);
-        return game;
+        GameData newGame = new GameData(gameId, null, null, game.gameName(), null);
+        games.put(gameId, newGame);
+        return newGame;
     }
+
     public GameData getGame(int gameID) {
         return games.get(gameID);
     }
@@ -32,11 +33,11 @@ public class DAOgameData {
         GameData gameData = games.get(ID);
         switch(color){
             case "WHITE":
-                if (gameData.whiteUsername() != null){
+                if (gameData.whiteUsername() == null){
                     return null;
                 }
             case "BLACK":
-                if (gameData.blackUsername() != null){
+                if (gameData.blackUsername() == null){
                     return null;
                 }
         }
