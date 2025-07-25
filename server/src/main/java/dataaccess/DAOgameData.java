@@ -1,8 +1,10 @@
 package dataaccess;
+import chess.ChessGame;
 import java.util.HashMap;
 import java.util.Map;
 import model.GameData;
 import model.JoinRequest;
+import java.util.ArrayList;
 
 public class DAOgameData {
     private final Map<Integer, GameData> games = new HashMap<>();
@@ -16,30 +18,30 @@ public class DAOgameData {
         return newGame;
     }
 
-    public GameData getGame(int gameID) {
-        return games.get(gameID);
-    }
-
     public void clear() {
         games.clear();
         nextId = 1;
     }
 
-    public Map<Integer, GameData> list() {
-        return games;
+    public ArrayList list() {
+        for (game :: games){
+            
+        };
     }
 
-    public String checkColor(int ID, String color) {
+    public ChessGame.TeamColor checkColor(int ID, ChessGame.TeamColor color) {
         GameData gameData = games.get(ID);
         switch(color){
-            case "WHITE":
+            case ChessGame.TeamColor.WHITE:
                 if (gameData.whiteUsername() == null){
                     return null;
                 }
-            case "BLACK":
+                break;
+            case ChessGame.TeamColor.BLACK:
                 if (gameData.blackUsername() == null){
                     return null;
                 }
+                break;
         }
         return color;
     }
@@ -47,10 +49,14 @@ public class DAOgameData {
     public void updateGame(JoinRequest join, String username) {
         GameData gameData = games.get(join.gameID());
         switch(join.playerColor()){
-            case "WHITE":
+            case ChessGame.TeamColor.WHITE:
                 games.put(join.gameID(), new GameData(join.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game()));
-            case "BLACK":
+            case ChessGame.TeamColor.BLACK:
                 games.put(join.gameID(), new GameData(join.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game()));
                 }
         }
+
+    public GameData checkGame(JoinRequest join) {
+        return games.get(join.gameID());
     }
+}

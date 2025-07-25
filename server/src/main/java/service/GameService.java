@@ -1,4 +1,5 @@
 package service;
+import chess.ChessGame;
 import dataaccess.DAOauthToken;
 import dataaccess.DAOgameData;
 import dataaccess.DAOuserData;
@@ -7,8 +8,7 @@ import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
 import spark.Request;
-
-
+import java.util.ArrayList;
 import java.util.Map;
 
 public class GameService {
@@ -37,11 +37,11 @@ public class GameService {
         return gameDAO.createGame(gameID);
     }
 
-    public Map<Integer, GameData> list(AuthData user) throws DataAccessException {
+    public ArrayList list(AuthData user) throws DataAccessException {
         //check if authToken exists
         Object userData = tokenDAO.getAuth(user);
         if(userData == null){
-            throw new DataAccessException("Unathorized");
+            throw new DataAccessException("Error: unauthorized");
         }
         return gameDAO.list();
     }
@@ -52,16 +52,23 @@ public class GameService {
         if(token == null ){
             throw new DataAccessException("Error: unauthorized");
         }
-        // bad request
-        if(join.playerColor()==null||join.gameID()<1 ){
+
+        // bad request 1
+        ChessGame.TeamColor playerColor = join.playerColor();
+        if(playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.WHITE ){
             throw new DataAccessException("Error: bad request");
         }
+        // bad request 2
+        if( gameDAO.checkGame(join) == null ){
+            throw new DataAccessException("Error: bad request");
+        }
+
         // get the username
         String username = tokenDAO.getUsername(authData.authToken());
 
         // check if color is already taken
-        String gameDataColor =  gameDAO.checkColor(join.gameID(), join.playerColor());
-        if(gameDataColor != null){
+        ChessGame.TeamColor gameDataColor =  gameDAO.checkColor(join.gameID(), join.playerColor());
+        if(join.playerColor() != null && gameDataColor != null){
             throw new DataAccessException("Error: already taken");
         }
         //update game
