@@ -2,7 +2,7 @@ package dataaccess;
 import chess.ChessGame;
 
 import java.util.*;
-
+import dataaccess.DataAccessException;
 import model.GameData;
 import model.JoinRequest;
 import model.ListData;
@@ -11,11 +11,17 @@ import model.ListDataObject;
 public class DAOgameData {
     private final Map<Integer, GameData> games = new HashMap<>();
     private int nextId = 1;
+    public String getGame(JoinRequest join){
+        if (games.get(join.gameID()) == null){
+            return null;
+        }
+        return "exists";
+    }
 
     public GameData createGame(GameData game) {
         //new id number just by adding one
         int gameId = nextId++;
-        GameData newGame = new GameData(gameId, null, null, game.gameName(), null);
+        GameData newGame = new GameData(gameId, null, null, game.gameName(), new ChessGame());
         games.put(gameId, newGame);
         return newGame;
     }
@@ -44,15 +50,22 @@ public class DAOgameData {
         return color;
     }
 
-    public void updateGame(JoinRequest join, String username) {
-        GameData gameData = games.get(join.gameID());
-        switch(join.playerColor()){
-            case ChessGame.TeamColor.WHITE:
-                games.put(join.gameID(), new GameData(join.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game()));
-            case ChessGame.TeamColor.BLACK:
-                games.put(join.gameID(), new GameData(join.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game()));
-                }
+    public void setWhiteUsername(int gameID, String username)throws DataAccessException{
+        GameData game = games.get(gameID);
+        if (game == null) {
+            throw new DataAccessException("Game not found");
         }
+        GameData updated = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+        games.put(gameID, updated);
+    }
+    public void setBlackUsername(int gameID, String username)throws DataAccessException{
+        GameData game = games.get(gameID);
+        if (game == null) {
+            throw new DataAccessException("Game not found");
+        }
+        GameData updated = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+        games.put(gameID, updated);
+    }
 
     public GameData checkGame(JoinRequest join) {
         return games.get(join.gameID());

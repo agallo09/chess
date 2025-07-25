@@ -46,23 +46,18 @@ public class GameService {
         if(userData == null){
             throw new DataAccessException("Error: unauthorized");
         }
+
         List<ListDataObject> gamesList = new ArrayList<>();
 
         List<GameData> games = new ArrayList<>(gameDAO.list());
         for (GameData game : games) {
-            gamesList.add(new ListDataObject(
-                    game.gameID(),
-                    game.whiteUsername(),
-                    game.blackUsername(),
-                    game.gameName()
-            ));
+            gamesList.add(new ListDataObject (game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
         }
         return new ListData(gamesList);
     }
 
-    public String join(AuthData authData, JoinRequest join) throws DataAccessException {
+    public String join(String token, JoinRequest join) throws DataAccessException {
         //check if authToken exists
-        Object token = tokenDAO.getAuth(authData);
         if(token == null ){
             throw new DataAccessException("Error: unauthorized");
         }
@@ -76,7 +71,10 @@ public class GameService {
         if( gameDAO.checkGame(join) == null ){
             throw new DataAccessException("Error: bad request");
         }
-
+        // bad request 3
+        if(gameDAO.getGame(join) == null ){
+            throw new DataAccessException("Error: bad request");
+        }
 
         // check if color is already taken
         ChessGame.TeamColor gameDataColor =  gameDAO.checkColor(join.gameID(), join.playerColor());
@@ -85,9 +83,13 @@ public class GameService {
         }
 
         // get the username
-        String username = tokenDAO.getUsername(authData.authToken());
+        String username = tokenDAO.getUsername(token);
         //update game
-        gameDAO.updateGame(join, username);
+        if (playerColor == ChessGame.TeamColor.WHITE) {
+            gameDAO.setWhiteUsername(join.gameID(), username);
+        } else {
+            gameDAO.setBlackUsername(join.gameID(), username);
+        }
         return ("{}");
     }
 

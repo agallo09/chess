@@ -29,9 +29,8 @@ public class joinGameHandler implements Route {
             JoinRequest joinRequest = gson.fromJson(jsonBody, JoinRequest.class);
             // header
             String token = request.headers("authorization");
-            AuthData authData = new AuthData(token, null);
             // service method
-            String joinResult = gameService.join(authData, joinRequest);
+            String joinResult = gameService.join(token, joinRequest);
             // only display gameID
             return joinResult;
         }catch(DataAccessException e) {

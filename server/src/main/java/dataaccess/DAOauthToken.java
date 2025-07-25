@@ -9,9 +9,6 @@ public class DAOauthToken {
 
     public DAOauthToken(){}
     public void createAuth(AuthData authdata) {
-        if (auths.containsKey(authdata.authToken())) {
-
-        }
         auths.put(authdata.authToken(), authdata.username());
     }
 
@@ -33,7 +30,11 @@ public class DAOauthToken {
         auths.clear();
     }
 
-    public String getUsername(String s) {
-        return auths.get(s);
+    public String getUsername(String token) throws DataAccessException {
+        String username = auths.get(token);
+        if (username == null) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        return username;
     }
 }

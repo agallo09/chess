@@ -50,7 +50,7 @@ public class UserService {
         }
         //create user
         userDAO.createUser(user);
-        // Generate token 
+        // Generate token
         String token = java.util.UUID.randomUUID().toString();
         //add AuthData
         AuthData tokens = new AuthData(token, user.username());
