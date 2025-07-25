@@ -1,10 +1,12 @@
 package dataaccess;
 import chess.ChessGame;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
+
 import model.GameData;
 import model.JoinRequest;
-import java.util.ArrayList;
+import model.ListData;
+import model.ListDataObject;
 
 public class DAOgameData {
     private final Map<Integer, GameData> games = new HashMap<>();
@@ -23,10 +25,8 @@ public class DAOgameData {
         nextId = 1;
     }
 
-    public ArrayList list() {
-        for (game :: games){
-            
-        };
+    public Collection<GameData> list() {
+        return games.values();
     }
 
     public ChessGame.TeamColor checkColor(int ID, ChessGame.TeamColor color) {

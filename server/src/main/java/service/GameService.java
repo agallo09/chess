@@ -7,9 +7,12 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
-import spark.Request;
+import model.ListData;
+import model.ListDataObject;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+
+
 
 public class GameService {
     private DAOauthToken tokenDAO;
@@ -37,13 +40,24 @@ public class GameService {
         return gameDAO.createGame(gameID);
     }
 
-    public ArrayList list(AuthData user) throws DataAccessException {
+    public ListData list(AuthData user) throws DataAccessException {
         //check if authToken exists
         Object userData = tokenDAO.getAuth(user);
         if(userData == null){
             throw new DataAccessException("Error: unauthorized");
         }
-        return gameDAO.list();
+        List<ListDataObject> gamesList = new ArrayList<>();
+
+        List<GameData> games = new ArrayList<>(gameDAO.list());
+        for (GameData game : games) {
+            gamesList.add(new ListDataObject(
+                    game.gameID(),
+                    game.whiteUsername(),
+                    game.blackUsername(),
+                    game.gameName()
+            ));
+        }
+        return new ListData(gamesList);
     }
 
     public String join(AuthData authData, JoinRequest join) throws DataAccessException {

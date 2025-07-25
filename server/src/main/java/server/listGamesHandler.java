@@ -3,14 +3,16 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
+import model.ListData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import java.util.List;
 import java.util.Map;
 import java.util.Map;
 import java.util.ArrayList;
+
 
 public class listGamesHandler implements Route {
     private final GameService gameService;
@@ -24,7 +26,7 @@ public class listGamesHandler implements Route {
         try {
             String jsonString = request.headers("authorization");
             AuthData user = new AuthData(jsonString, null);
-            Arraylist<> games = gameService.list(user);
+            ListData games = gameService.list(user);
             response.status(200);
             return gson.toJson(games);
         }catch(DataAccessException e) {
