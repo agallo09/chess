@@ -35,8 +35,8 @@ public class DAOgameData {
         return games.values();
     }
 
-    public ChessGame.TeamColor checkColor(int ID, ChessGame.TeamColor color) {
-        GameData gameData = games.get(ID);
+    public ChessGame.TeamColor checkColor(int id, ChessGame.TeamColor color) {
+        GameData gameData = games.get(id);
         switch(color){
             case ChessGame.TeamColor.WHITE:
                 if (gameData.whiteUsername() == null){

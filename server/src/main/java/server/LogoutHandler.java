@@ -3,17 +3,16 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
-import model.UserData;
 import service.authService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
+import server.ResponseUtil;
 import java.util.Map;
 
-public class logoutHandler implements Route {
+public class LogoutHandler implements Route {
     private authService authService;
-    public logoutHandler(authService authService){
+    public LogoutHandler(authService authService){
         this.authService = authService;
     }
 
@@ -26,13 +25,7 @@ public class logoutHandler implements Route {
             AuthData logoutResult = authService.logout(user);
             return gson.toJson(logoutResult);
         }catch (DataAccessException e) {
-            String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
-            if (msg.contains("unauthorized")) {
-                response.status(401);
-            } else {
-                response.status(500);
-            }
-            return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            return ResponseUtil.handleException(response, e);
         }
     }
 }

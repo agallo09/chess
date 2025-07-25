@@ -1,35 +1,35 @@
 package server;
+
 import com.google.gson.Gson;
-import model.UserData;
+import dataaccess.DataAccessException;
 import model.AuthData;
+import model.UserData;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import dataaccess.DataAccessException;
+
 import java.util.Map;
 
-
-public class loginHandler implements Route {
+public class RegistrationHandler implements Route {
     private final UserService userService;
-
-    public loginHandler(service.UserService userService){
+    public RegistrationHandler(UserService userService) {
         this.userService = userService;
     }
+
     @Override
     public Object handle(Request request, Response response) throws Exception {
         Gson gson = new Gson();
         try {
             String jsonString = request.body();
             UserData user = gson.fromJson(jsonString, UserData.class);
-            AuthData token = userService.login(user);
-            response.status(200);
+            AuthData token = userService.register(user);
             return gson.toJson(token);
-        } catch (DataAccessException e) {
+        }catch(DataAccessException e){
             String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
 
-            if (msg.contains("unauthorized")) {
-                response.status(401);
+            if (msg.contains("already taken")) {
+                response.status(403);
             } else if (msg.contains("bad request")) {
                 response.status(400);
             } else {
@@ -37,6 +37,5 @@ public class loginHandler implements Route {
             }
             return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
         }
-        }
-
+    }
 }

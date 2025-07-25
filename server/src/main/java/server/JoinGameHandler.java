@@ -2,8 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import model.AuthData;
-import model.GameData;
 import model.JoinRequest;
 import service.GameService;
 import service.authService;
@@ -12,10 +10,10 @@ import spark.Response;
 import spark.Route;
 import java.util.Map;
 
-public class joinGameHandler implements Route {
+public class JoinGameHandler implements Route {
     private final authService authService;
     private final GameService gameService;
-    public joinGameHandler(authService authService, GameService gameService) {
+    public JoinGameHandler(authService authService, GameService gameService) {
         this.authService = authService;
         this.gameService = gameService;
     }
