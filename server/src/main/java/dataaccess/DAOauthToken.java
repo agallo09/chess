@@ -9,6 +9,9 @@ public class DAOauthToken {
 
     public DAOauthToken(){}
     public void createAuth(AuthData authdata) {
+        if (auths.containsKey(authdata.authToken())) {
+
+        }
         auths.put(authdata.authToken(), authdata.username());
     }
 

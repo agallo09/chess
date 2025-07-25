@@ -28,8 +28,8 @@ public class joinGameHandler implements Route {
             String jsonBody = request.body();
             JoinRequest joinRequest = gson.fromJson(jsonBody, JoinRequest.class);
             // header
-            String jsonHeader = request.headers("authorization");
-            AuthData authData = new AuthData(jsonHeader, null);
+            String token = request.headers("authorization");
+            AuthData authData = new AuthData(token, null);
             // service method
             String joinResult = gameService.join(authData, joinRequest);
             // only display gameID
@@ -41,7 +41,7 @@ public class joinGameHandler implements Route {
                 response.status(401);
             } else if (msg.contains("bad request")) {
                 response.status(400);
-            } else if (msg.contains("Error: already taken")){
+            } else if (msg.contains("already taken")){
                 response.status(403);
             }else {
                 response.status(500);

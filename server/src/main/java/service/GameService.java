@@ -69,7 +69,7 @@ public class GameService {
 
         // bad request 1
         ChessGame.TeamColor playerColor = join.playerColor();
-        if(playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.WHITE ){
+        if(playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK ){
             throw new DataAccessException("Error: bad request");
         }
         // bad request 2
@@ -77,14 +77,15 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
         }
 
-        // get the username
-        String username = tokenDAO.getUsername(authData.authToken());
 
         // check if color is already taken
         ChessGame.TeamColor gameDataColor =  gameDAO.checkColor(join.gameID(), join.playerColor());
-        if(join.playerColor() != null && gameDataColor != null){
+        if(gameDataColor != null){
             throw new DataAccessException("Error: already taken");
         }
+
+        // get the username
+        String username = tokenDAO.getUsername(authData.authToken());
         //update game
         gameDAO.updateGame(join, username);
         return ("{}");
