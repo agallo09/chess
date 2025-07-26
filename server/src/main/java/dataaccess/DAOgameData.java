@@ -42,10 +42,12 @@ public class DAOgameData {
                 if (gameData.whiteUsername() == null){
                     return null;
                 }
+                break;
             case ChessGame.TeamColor.BLACK:
                 if (gameData.blackUsername() == null){
                     return null;
                 }
+                 break;
         }
         return color;
     }
