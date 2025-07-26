@@ -204,12 +204,11 @@ public class ChessGame {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition pos = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(pos);
-
-                if (piece == null || piece.getTeamColor() != teamColor) continue;
-
-                Collection<ChessMove> moves = validMoves(pos);
-                if (moves != null && !moves.isEmpty()) {
-                    return true;
+                if (piece == null || piece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> moves = validMoves(pos);
+                    if (moves != null && !moves.isEmpty()) {
+                        return true;
+                    }
                 }
             }
         }
