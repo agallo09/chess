@@ -4,16 +4,16 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.JoinRequest;
 import service.GameService;
-import service.authService;
+import service.AuthService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import java.util.Map;
 
 public class JoinGameHandler implements Route {
-    private final authService authService;
+    private final AuthService authService;
     private final GameService gameService;
-    public JoinGameHandler(authService authService, GameService gameService) {
+    public JoinGameHandler(AuthService authService, GameService gameService) {
         this.authService = authService;
         this.gameService = gameService;
     }

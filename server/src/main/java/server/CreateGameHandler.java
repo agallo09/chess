@@ -5,18 +5,15 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import service.GameService;
 import model.GameData;
-import service.authService;
+import service.AuthService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import server.ResponseUtil;
-
-import java.util.Map;
 
 public class CreateGameHandler implements Route {
-    private final authService authService;
+    private final AuthService authService;
     private final GameService gameService;
-    public CreateGameHandler(authService authService, GameService gameService) {
+    public CreateGameHandler(AuthService authService, GameService gameService) {
         this.authService = authService;
         this.gameService = gameService;
     }

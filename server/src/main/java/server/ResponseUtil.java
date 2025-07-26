@@ -6,7 +6,7 @@ import spark.Response;
 import java.util.Map;
 
 public class ResponseUtil {
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     public static String handleException(Response response, Exception e) {
         String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
@@ -19,6 +19,6 @@ public class ResponseUtil {
             response.status(500);
         }
 
-        return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+        return GSON.toJson(Map.of("message", "Error: " + e.getMessage()));
     }
 }

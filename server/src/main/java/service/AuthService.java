@@ -4,10 +4,10 @@ import dataaccess.DAOauthToken;
 import dataaccess.DataAccessException;
 import model.AuthData;
 
-public class authService {
+public class AuthService {
     private final DAOauthToken tokenDAO;
 
-    public authService(DAOauthToken token){
+    public AuthService(DAOauthToken token){
 
         this.tokenDAO =token;
     }

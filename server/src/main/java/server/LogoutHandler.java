@@ -3,16 +3,14 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
-import service.authService;
+import service.AuthService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import server.ResponseUtil;
-import java.util.Map;
 
 public class LogoutHandler implements Route {
-    private authService authService;
-    public LogoutHandler(authService authService){
+    private AuthService authService;
+    public LogoutHandler(AuthService authService){
         this.authService = authService;
     }
 
