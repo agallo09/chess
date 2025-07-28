@@ -52,7 +52,7 @@ public class DatabaseManager {
         }
     }
 
-    private static void createTables() throws DataAccessException{
+    public static void createTables() throws DataAccessException{
         try {
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
             Statement stmt = conn.createStatement();
