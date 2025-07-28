@@ -52,6 +52,37 @@ public class DatabaseManager {
         }
     }
 
+    private static void createTables() throws DataAccessException{
+        try {
+            var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+            Statement stmt = conn.createStatement();
+            String sqlCreateUsers = "CREATE TABLE IF NOT EXISTS Users (" +
+                    "username VARCHAR(50) NOT NULL PRIMARY KEY, " +
+                    "password VARCHAR(255) NOT NULL" +
+                    ")";
+            stmt.executeUpdate(sqlCreateUsers);
+            String sqlCreateAuthTokens = "CREATE TABLE IF NOT EXISTS AuthTokens (" +
+                    "token VARCHAR(255) NOT NULL PRIMARY KEY, " +
+                    "username VARCHAR(50) NOT NULL, " +
+                    "FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE" +
+                    ")";
+            stmt.executeUpdate(sqlCreateAuthTokens);
+            String sqlCreateGames = "CREATE TABLE IF NOT EXISTS Games (" +
+                    "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+                    "name VARCHAR(100) NOT NULL, " +
+                    "whiteUsername VARCHAR(50), " +
+                    "blackUsername VARCHAR(50), " +
+                    "gameState TEXT NOT NULL, " +
+                    "FOREIGN KEY (whiteUsername) REFERENCES Users(username) ON DELETE SET NULL, " +
+                    "FOREIGN KEY (blackUsername) REFERENCES Users(username) ON DELETE SET NULL" +
+                    ")";
+            stmt.executeUpdate(sqlCreateGames);
+        } catch (SQLException ex) {
+            throw new DataAccessException("failed to get connection", ex);
+        }
+
+    }
+
     private static void loadPropertiesFromResources() {
         try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
             if (propStream == null) {
