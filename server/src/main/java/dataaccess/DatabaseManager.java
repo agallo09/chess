@@ -55,9 +55,11 @@ public class DatabaseManager {
         try {
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
             Statement stmt = conn.createStatement();
-            String sqlCreateUsers = "CREATE TABLE IF NOT EXISTS Users (" +
+            String sqlCreateUsers = "CREATE TABLE IF NOT EXISTS Users " +
+                    "(" +
                     "username VARCHAR(50) NOT NULL PRIMARY KEY, " +
                     "password VARCHAR(255) NOT NULL" +
+                    "email VARCHAR(100) NOT NULL"+
                     ")";
             stmt.executeUpdate(sqlCreateUsers);
             String sqlCreateAuthTokens = "CREATE TABLE IF NOT EXISTS AuthTokens (" +
@@ -66,14 +68,15 @@ public class DatabaseManager {
                     "FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE" +
                     ")";
             stmt.executeUpdate(sqlCreateAuthTokens);
-            String sqlCreateGames = "CREATE TABLE IF NOT EXISTS Games (" +
-                    "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
-                    "name VARCHAR(100) NOT NULL, " +
-                    "whiteUsername VARCHAR(50), " +
-                    "blackUsername VARCHAR(50), " +
-                    "gameState TEXT NOT NULL, " +
-                    "FOREIGN KEY (whiteUsername) REFERENCES Users(username) ON DELETE SET NULL, " +
-                    "FOREIGN KEY (blackUsername) REFERENCES Users(username) ON DELETE SET NULL" +
+            String sqlCreateGames = "CREATE TABLE IF NOT EXISTS Games " +
+                    "(\n" +
+                    "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
+                    "name VARCHAR(100) NOT NULL,\n" +
+                    "whiteUsername VARCHAR(50),\n" +
+                    "blackUsername VARCHAR(50),\n" +
+                    "game TEXT NOT NULL,\n" +
+                    "FOREIGN KEY (whiteUsername) REFERENCES Users(username) ON DELETE SET NULL,\n" +
+                    "FOREIGN KEY (blackUsername) REFERENCES Users(username) ON DELETE SET NULL\n" +
                     ")";
             stmt.executeUpdate(sqlCreateGames);
         } catch (SQLException ex) {
