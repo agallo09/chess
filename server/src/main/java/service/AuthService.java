@@ -1,13 +1,13 @@
 package service;
 
-import dataaccess.DAOauthToken;
+import dataaccess.AuthTokenDaoInterface;
 import dataaccess.DataAccessException;
 import model.AuthData;
 
 public class AuthService {
-    private final DAOauthToken tokenDAO;
+    private final AuthTokenDaoInterface tokenDAO;
 
-    public AuthService(DAOauthToken token){
+    public AuthService(AuthTokenDaoInterface token){
 
         this.tokenDAO =token;
     }

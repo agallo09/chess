@@ -1,8 +1,8 @@
 package service;
 import chess.ChessGame;
 import dataaccess.DAOauthToken;
-import dataaccess.DAOgameData;
-import dataaccess.DAOuserData;
+import dataaccess.GameDaoInterface;
+import dataaccess.UserDaoInterface;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
@@ -16,9 +16,9 @@ import java.util.List;
 
 public class GameService {
     private DAOauthToken tokenDAO;
-    private DAOgameData gameDAO;
-    private DAOuserData userDAO;
-    public GameService(DAOauthToken tokenDAO, DAOgameData gameDAO, DAOuserData userDAO) {
+    private GameDaoInterface gameDAO;
+    private UserDaoInterface userDAO;
+    public GameService(DAOauthToken tokenDAO, GameDaoInterface gameDAO, UserDaoInterface userDAO) {
 
         this.tokenDAO = tokenDAO;
         this.gameDAO = gameDAO;
