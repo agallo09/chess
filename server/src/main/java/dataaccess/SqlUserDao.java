@@ -8,8 +8,6 @@ public class SqlUserDao implements UserDaoInterface{
     public SqlUserDao() {
         // nothing in constructor
     }
-
-
     @Override
     public void createUser(UserData user) throws DataAccessException {
         String username = user.username();

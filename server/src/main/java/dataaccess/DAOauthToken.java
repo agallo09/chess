@@ -17,7 +17,6 @@ public class DAOauthToken implements AuthTokenDaoInterface{
     public void deleteAuthInfo(String token) {
         if (auths.containsKey(token)) {
             auths.remove(token);
-            return ;
         }
     }
     @Override

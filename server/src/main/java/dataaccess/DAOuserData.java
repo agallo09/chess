@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DAOuserData implements UserDaoInterface {
-
     private final Map<String, UserData> users = new HashMap<>();
 
     //constructor
