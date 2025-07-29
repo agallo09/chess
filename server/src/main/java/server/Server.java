@@ -9,11 +9,12 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-        //Initialize objects for the DAOs and services so i dont have to create them inside classes
+        //Initialize objects for the DAOs and services,
+        // so I do not have to create them inside classes
 
-        DAOgameData gameDAO = new DAOgameData();
-        DAOauthToken tokenDAO = new DAOauthToken();
-        DAOuserData userDAO = new DAOuserData();
+        SqlGameDao gameDAO = new SqlGameDao();
+        SqlAuthTokenDao tokenDAO = new SqlAuthTokenDao();
+        SqlUserDao userDAO = new SqlUserDao();
         UserService userService = new UserService(userDAO, tokenDAO);
         GameService gameService = new GameService(tokenDAO, gameDAO, userDAO);
         AuthService authService = new AuthService(tokenDAO);

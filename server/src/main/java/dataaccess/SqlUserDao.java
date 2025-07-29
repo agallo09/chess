@@ -12,11 +12,12 @@ public class SqlUserDao implements UserDaoInterface{
     public void createUser(UserData user) throws DataAccessException {
         String username = user.username();
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        String sql = "INSERT INTO Users (username, password) VALUES (?, ?)";
+        String sql = "INSERT INTO Users (username, password, email) VALUES (?, ?, ?)";
         try(Connection conn = DatabaseManager.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setString(1,username);
             stmt.setString(2, hashedPassword);
+            stmt.setString(3, user.email());
             stmt.executeUpdate();
         }catch (SQLException e) {
             throw new DataAccessException("Unable to create user", e);

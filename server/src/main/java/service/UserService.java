@@ -1,16 +1,14 @@
 package service;
-import dataaccess.DAOauthToken;
-import dataaccess.UserDaoInterface;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
 public class UserService {
 
     private final UserDaoInterface userDAO;
-    private final DAOauthToken tokenDAO;
+    private final AuthTokenDaoInterface tokenDAO;
 
-    public UserService(UserDaoInterface userDAO, DAOauthToken tokenDAO){
+    public UserService(SqlUserDao userDAO, SqlAuthTokenDao tokenDAO){
         this.userDAO = userDAO;
         this.tokenDAO = tokenDAO;
     }

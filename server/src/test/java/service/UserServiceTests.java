@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
 
     private UserService service;
-    private DAOuserData userDAO;
-    private DAOauthToken authDAO;
+    private SqlUserDao userDAO;
+    private SqlAuthTokenDao authDAO;
 
     @BeforeEach
     public void setup() {
-        userDAO = new DAOuserData();
-        authDAO = new DAOauthToken();
+        userDAO = new SqlUserDao();
+        authDAO = new SqlAuthTokenDao();
         service = new UserService(userDAO, authDAO);
     }
 
