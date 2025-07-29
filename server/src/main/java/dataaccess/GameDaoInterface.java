@@ -8,12 +8,12 @@ import model.JoinRequest;
 import java.util.Collection;
 
 public interface GameDaoInterface {
-    GameData createGame(GameData game);
-    String getGame(JoinRequest join);
-    ChessGame.TeamColor checkColor(int id, ChessGame.TeamColor color);
+    GameData createGame(GameData game) throws DataAccessException;
+    String getGame(JoinRequest join) throws DataAccessException;
+    ChessGame.TeamColor checkColor(int id, ChessGame.TeamColor color) throws DataAccessException;
     void setWhiteUsername(int gameID, String username) throws DataAccessException;
     void setBlackUsername(int gameID, String username) throws DataAccessException;
-    GameData checkGame(JoinRequest join);
+    GameData checkGame(JoinRequest join) throws DataAccessException;
     Collection<GameData> list() throws DataAccessException;
-    void clear();
+    void clear() throws DataAccessException;
 }

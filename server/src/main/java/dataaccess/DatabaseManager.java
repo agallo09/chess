@@ -53,12 +53,12 @@ public class DatabaseManager {
 
     public static void createTables() throws DataAccessException{
         try {
-            var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+            var conn = DatabaseManager.getConnection();
             Statement stmt = conn.createStatement();
             String sqlCreateUsers = "CREATE TABLE IF NOT EXISTS Users " +
                     "(" +
                     "username VARCHAR(50) NOT NULL PRIMARY KEY, " +
-                    "password VARCHAR(255) NOT NULL" +
+                    "password VARCHAR(255) NOT NULL," +
                     "email VARCHAR(100) NOT NULL"+
                     ")";
             stmt.executeUpdate(sqlCreateUsers);
