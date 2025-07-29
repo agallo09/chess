@@ -71,7 +71,7 @@ public class DatabaseManager {
             String sqlCreateGames = "CREATE TABLE IF NOT EXISTS Games " +
                     "(\n" +
                     "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
-                    "name VARCHAR(100) NOT NULL,\n" +
+                    "name VARCHAR(100) NOT NULL UNIQUE,\n" +
                     "whiteUsername VARCHAR(50),\n" +
                     "blackUsername VARCHAR(50),\n" +
                     "game TEXT NOT NULL,\n" +
