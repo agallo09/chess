@@ -21,10 +21,14 @@ public class ClearHandler implements Route {
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
-        //going to user map
-        userService.clear();
-        gameService.clear();
-        authService.clear();
-        return ("{}");
+        try {
+            userService.clear();
+            gameService.clear();
+            authService.clear();
+            return "{}";
+        } catch (Exception e) {
+            response.status(500);
+            return "{\"message\":\"Error: internal server error\"}";
+        }
     }
 }

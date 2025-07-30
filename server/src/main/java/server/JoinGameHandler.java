@@ -44,6 +44,10 @@ public class JoinGameHandler implements Route {
                 response.status(500);
             }
             return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+        }catch (Exception e) {
+            // This catches anything unexpected (e.g., misconfigured DB)
+            response.status(500);
+            return gson.toJson(Map.of("message", "Error: internal server error"));
         }
     }
 }

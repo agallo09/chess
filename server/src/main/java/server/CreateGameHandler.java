@@ -10,6 +10,8 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.util.Map;
+
 public class CreateGameHandler implements Route {
     private final AuthService authService;
     private final GameService gameService;
@@ -34,6 +36,10 @@ public class CreateGameHandler implements Route {
             return gson.toJson(createResult);
         } catch (DataAccessException e) {
         return ResponseUtil.handleException(response, e);
-    }
+        }catch (Exception e) {
+            // This catches anything unexpected (e.g., misconfigured DB)
+            response.status(500);
+            return gson.toJson(Map.of("message", "Error: internal server error"));
+        }
     }
 }
