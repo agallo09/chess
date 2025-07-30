@@ -23,9 +23,7 @@ public class SQLUserServiceTests {
 
     }
 
-    private UserData createTestUser() {
-        return new UserData("john_doe", "password123", "john@example.com");
-    }
+
     private void assertValidRegistration(AuthData result, String expectedUsername) {
         assertNotNull(result);
         assertEquals(expectedUsername, result.username());
