@@ -1,4 +1,5 @@
 package server;
+
 import service.*;
 import dataaccess.*;
 import spark.*;
@@ -9,18 +10,27 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-        //Initialize objects for the DAOs and services,
-        // so I do not have to create them inside classes
+        // Create and configure the database before DAOs are created
+        try {
+            // Create database if not exists
+            DatabaseManager.createDatabase();
+            // Create tables if not exists
+            DatabaseManager.createTables();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database setup failed: " + e.getMessage(), e);
+        }
 
+        // Initialize DAO objects after database setup
         SqlGameDao gameDAO = new SqlGameDao();
         SqlAuthTokenDao tokenDAO = new SqlAuthTokenDao();
         SqlUserDao userDAO = new SqlUserDao();
+
+        // Initialize service objects
         UserService userService = new UserService(userDAO, tokenDAO);
         GameService gameService = new GameService(tokenDAO, gameDAO, userDAO);
         AuthService authService = new AuthService(tokenDAO);
 
-
-        // Register your endpoints and handle exceptions here.
+        // Register endpoints with appropriate handlers
         Spark.post("/user", new RegistrationHandler(userService));
         Spark.post("/session", new LoginHandler(userService));
         Spark.delete("/session", new LogoutHandler(authService));
@@ -29,12 +39,10 @@ public class Server {
         Spark.put("/game", new JoinGameHandler(authService, gameService));
         Spark.delete("/db", new ClearHandler(userService, gameService, authService));
 
-
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        // Initialize the server and wait for it to start
         Spark.init();
-
         Spark.awaitInitialization();
+
         return Spark.port();
     }
 

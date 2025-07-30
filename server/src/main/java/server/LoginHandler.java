@@ -18,7 +18,7 @@ public class LoginHandler implements Route {
         this.userService = userService;
     }
     @Override
-    public Object handle(Request request, Response response) throws Exception {
+    public Object handle(Request request, Response response) {
         Gson gson = new Gson();
         try {
             String jsonString = request.body();
@@ -28,11 +28,10 @@ public class LoginHandler implements Route {
             return gson.toJson(token);
         } catch (DataAccessException e) {
             return ResponseUtil.handleException(response, e);
-        }catch (Exception e) {
-            // This catches anything unexpected (e.g., misconfigured DB)
+        } catch (Exception e) {
             response.status(500);
             return gson.toJson(Map.of("message", "Error: internal server error"));
         }
-        }
+    }
 
 }
