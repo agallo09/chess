@@ -25,6 +25,7 @@ public class ClearHandler implements Route {
             userService.clear();
             gameService.clear();
             authService.clear();
+            response.status(200);
             return "{}";
         } catch (Exception e) {
             response.status(500);
