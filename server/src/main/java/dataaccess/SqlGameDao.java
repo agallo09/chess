@@ -27,7 +27,7 @@ public class SqlGameDao implements GameDaoInterface {
             rs.next();
             int gameId = rs.getInt(1);
 
-            return new GameData(gameId, game.gameName(), null, null, new ChessGame());
+            return new GameData(gameId, null, null,game.gameName(), new ChessGame());
 
         } catch (SQLException e) {
             throw new DataAccessException("Unable to create game", e);

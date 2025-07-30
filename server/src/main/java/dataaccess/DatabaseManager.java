@@ -64,8 +64,7 @@ public class DatabaseManager {
             stmt.executeUpdate(sqlCreateUsers);
             String sqlCreateAuthTokens = "CREATE TABLE IF NOT EXISTS AuthTokens (" +
                     "token VARCHAR(255) NOT NULL PRIMARY KEY, " +
-                    "username VARCHAR(50) NOT NULL, " +
-                    "FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE" +
+                    "username VARCHAR(50) NOT NULL " +
                     ")";
             stmt.executeUpdate(sqlCreateAuthTokens);
             String sqlCreateGames = "CREATE TABLE IF NOT EXISTS Games " +

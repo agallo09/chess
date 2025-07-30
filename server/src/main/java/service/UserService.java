@@ -8,7 +8,7 @@ public class UserService {
     private final UserDaoInterface userDAO;
     private final AuthTokenDaoInterface tokenDAO;
 
-    public UserService(SqlUserDao userDAO, SqlAuthTokenDao tokenDAO){
+    public UserService(UserDaoInterface userDAO, AuthTokenDaoInterface tokenDAO){
         this.userDAO = userDAO;
         this.tokenDAO = tokenDAO;
     }

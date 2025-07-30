@@ -14,7 +14,8 @@ public class SqlAuthTokenDao implements AuthTokenDaoInterface {
             stmt.setString(2, username);
             stmt.executeUpdate();
         }catch (SQLException e) {
-            throw new DataAccessException("Unable to create user", e);
+            e.printStackTrace();
+            throw new DataAccessException("Unable to create auth", e);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -27,7 +28,7 @@ public class SqlAuthTokenDao implements AuthTokenDaoInterface {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, token);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -43,7 +44,7 @@ public class SqlAuthTokenDao implements AuthTokenDaoInterface {
             if (values.next()) {
                 String username = values.getString("username");
                 String Token = values.getString("token");
-                return new AuthData(username,Token);
+                return new AuthData(Token,username);
             } else {
                 return null;
             }
@@ -74,8 +75,7 @@ public class SqlAuthTokenDao implements AuthTokenDaoInterface {
                 String Token = values.getString("token");
                 return username;
             } else {
-                return null;
-            }
+                throw new DataAccessException("Error: unauthorized");            }
         } catch (SQLException e) {
             throw new DataAccessException("Unable to get user", e);
         }

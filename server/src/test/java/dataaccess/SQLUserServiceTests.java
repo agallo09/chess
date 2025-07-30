@@ -1,22 +1,26 @@
-package service;
+package dataaccess;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserServiceTests {
+public class SQLUserServiceTests {
 
     private UserService service;
-    private DAOuserData userDAO;
-    private DAOauthToken authDAO;
+    private UserDaoInterface userDAO;
+    private AuthTokenDaoInterface authDAO;
 
     @BeforeEach
-    public void setup() {
-        userDAO = new DAOuserData();
-        authDAO = new DAOauthToken();
+    public void setup() throws DataAccessException {
+        userDAO = new SqlUserDao();
+        authDAO = new SqlAuthTokenDao();
         service = new UserService(userDAO, authDAO);
+        userDAO.clear(); // Clear Users table
+        authDAO.clear(); // Clear AuthTokens table
+
     }
 
     @Test

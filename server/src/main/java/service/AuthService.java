@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.AuthTokenDaoInterface;
 import dataaccess.DataAccessException;
+import dataaccess.SqlAuthTokenDao;
 import model.AuthData;
 
 public class AuthService {
