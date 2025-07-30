@@ -26,24 +26,29 @@ public class SQLUserServiceTests {
     private UserData createTestUser() {
         return new UserData("john_doe", "password123", "john@example.com");
     }
-
-    @Test
-    public void registerPositive() throws DataAccessException {
-        UserData newUser = createTestUser();
-        AuthData result = service.register(newUser);
+    private void assertValidRegistration(AuthData result, String expectedUsername) {
         assertNotNull(result);
-        assertEquals("john_doe", result.username());
+        assertEquals(expectedUsername, result.username());
         assertNotNull(result.authToken());
     }
+    @Test
+    public void registerPositive() throws DataAccessException {
+        UserData newUser = new UserData("john_doe", "password123", "john@example.com");
+        AuthData result = service.register(newUser);
+        assertValidRegistration(result, "john_doe");
+    }
 
+    private void assertDuplicateUserThrows(UserData user) {
+        DataAccessException ex = assertThrows(DataAccessException.class, () -> {
+            service.register(user);
+        });
+        assertEquals("Error: already taken", ex.getMessage());
+    }
     @Test
     public void registerNegativeDuplicateUser() throws DataAccessException {
         UserData newUser = new UserData("john_doe", "password123", "john@example.com");
         service.register(newUser); // First time: should succeed
-        DataAccessException ex = assertThrows(DataAccessException.class, () -> {
-            service.register(newUser);
-        });
-        assertEquals("Error: already taken", ex.getMessage());
+        assertDuplicateUserThrows(newUser);
     }
 
     //Test3s for login
@@ -76,4 +81,5 @@ public class SQLUserServiceTests {
         });
         assertEquals("Error: unauthorized", ex.getMessage());
     }
+
 }
