@@ -23,9 +23,13 @@ public class SQLUserServiceTests {
 
     }
 
+    private UserData createTestUser() {
+        return new UserData("john_doe", "password123", "john@example.com");
+    }
+
     @Test
     public void registerPositive() throws DataAccessException {
-        UserData newUser = new UserData("john_doe", "password123", "john@example.com");
+        UserData newUser = createTestUser();
         AuthData result = service.register(newUser);
         assertNotNull(result);
         assertEquals("john_doe", result.username());
@@ -43,11 +47,20 @@ public class SQLUserServiceTests {
     }
 
     //Test3s for login
+    private UserData createUser(String username, String password, String email) {
+        return new UserData(username, password, email);
+    }
+
+    private UserData createLoginUser(String username, String password) {
+        // For login, email can be null if not required
+        return new UserData(username, password, null);
+    }
+
     @Test
     public void loginPositive() throws DataAccessException {
-        UserData user = new UserData("jane_doe", "securePass", "jane@example.com");
+        UserData user = createUser("jane_doe", "securePass", "jane@example.com");
         service.register(user);
-        AuthData result = service.login(new UserData("jane_doe", "securePass", null));
+        AuthData result = service.login(createLoginUser("jane_doe", "securePass"));
         assertNotNull(result);
         assertEquals("jane_doe", result.username());
         assertNotNull(result.authToken());
@@ -55,13 +68,12 @@ public class SQLUserServiceTests {
 
     @Test
     public void loginNegativeWrongPassword() throws DataAccessException {
-        UserData user = new UserData("john_smith", "correctPass", "john@example.com");
+        UserData user = createUser("john_smith", "correctPass", "john@example.com");
         service.register(user);
-        UserData wrongPasswordUser = new UserData("john_smith", "wrongPass", null);
+        UserData wrongPasswordUser = createLoginUser("john_smith", "wrongPass");
         DataAccessException ex = assertThrows(DataAccessException.class, () -> {
             service.login(wrongPasswordUser);
         });
         assertEquals("Error: unauthorized", ex.getMessage());
     }
-
 }

@@ -43,8 +43,8 @@ public class SqlAuthTokenDao implements AuthTokenDaoInterface {
             ResultSet values = stmt.executeQuery();
             if (values.next()) {
                 String username = values.getString("username");
-                String Token = values.getString("token");
-                return new AuthData(Token,username);
+                String token1 = values.getString("token");
+                return new AuthData(token1,username);
             } else {
                 return null;
             }
@@ -72,7 +72,7 @@ public class SqlAuthTokenDao implements AuthTokenDaoInterface {
             ResultSet values = stmt.executeQuery();
             if (values.next()) {
                 String username = values.getString("username");
-                String Token = values.getString("token");
+                String token1 = values.getString("token");
                 return username;
             } else {
                 throw new DataAccessException("Error: unauthorized");            }
