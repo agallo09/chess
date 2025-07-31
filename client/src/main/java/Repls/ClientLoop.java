@@ -85,22 +85,30 @@ public class ClientLoop {
             throw new Exception("invalid input, try again.");
         }
         // check if the game exists first
+        int gameNumber;
         try {
-            if(games.isEmpty()){
-                throw new Exception("Please list games before trying to join");
-            }
+            gameNumber = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
-            throw new Exception("There is no game with that id");
+            throw new Exception("Invalid game number. Must be an integer.");
         }
-        if (params[0] == "black"){
-            int ID = games.get(Integer.parseInt(params[0]));
-            server.joinGame(ID, params[1], token);
 
-        } else if (params[0] == "white"){
-            server.joinGame(Integer.parseInt(params[0]), params[1], token);
-            makewhiteboard();
+        if (!games.containsKey(gameNumber)) {
+            throw new Exception("Game not found. Please use 'list' to see available games.");
         }
-        return "{}";
+        //join by color
+        int gameID = games.get(gameNumber);
+        String color = params[1].toLowerCase();
+        if (color.equals("black")) {
+            server.joinGame(gameID, "BLACK", token);
+            board.drawBlack();
+            return "Joined game as black.";
+        } else if (color.equals("white")) {
+            server.joinGame(gameID, "WHITE", token);
+            board.drawWhite();
+            return "Joined game as white.";
+        } else {
+            throw new Exception("Invalid color. Must be 'white' or 'black'.");
+        }
     }
 
     private String observe(String[] params) throws Exception {
@@ -116,8 +124,8 @@ public class ClientLoop {
         } catch (NumberFormatException e) {
             throw new Exception("Invalid game id");
         }
-        makewhiteboard();
-        return "board:";
+        board.drawWhite();
+        return "board";
     }
 
     private String logout(String[] params) throws Exception {
@@ -125,6 +133,8 @@ public class ClientLoop {
         if(params.length != 0){
             throw new Exception("invalid input, try again.");
         }
+        server.logout(token);
+        status = PRELOGIN;
         return "You logged out ";
     }
 
@@ -188,17 +198,11 @@ public class ClientLoop {
             throw new Exception("Wrong action, you are already signed in.");
         }
     }
+
     private void verifyPostLoginStatus() throws Exception {
         if (status == PRELOGIN){
             throw new Exception("Wrong action, you have to register or log in first.");
         }
-    }
-
-    public void makewhiteboard(){
-        board.drawWhite();
-    }
-    public void makeblackboard(){
-        board.drawBlack();
     }
 
     public State getstate() {
