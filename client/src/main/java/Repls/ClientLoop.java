@@ -15,6 +15,9 @@ public class ClientLoop {
     private ServerFacade server;
     private State status = PRELOGIN;
     private final Map<Integer,Integer> games = new HashMap<>();
+    private board board = new board();
+
+
 
     public ClientLoop(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
@@ -46,7 +49,7 @@ public class ClientLoop {
         if(params.length != 1){
             throw new Exception("invalid input, try again.");
         }
-        Integer id = server.createGame(params[0]);
+        Integer id = server.createGame(params[0], token);
         return "Game " + id + " created";
     }
 
@@ -64,9 +67,10 @@ public class ClientLoop {
         for (GameData game : games1) {
             games.put(i, game.gameID());
             output.append(String.format(
-                    "%d. Name: %s, White: %s, Black: %s%n",
+                    "%d. Name: %s  ,Id: %s  , White: %s  , Black: %s%n",
                     i++,
                     game.gameName(),
+                    game.gameID(),
                     game.whiteUsername() != null ? game.whiteUsername() : "none",
                     game.blackUsername() != null ? game.blackUsername() : "none"
             ));
@@ -85,14 +89,16 @@ public class ClientLoop {
             if(games.isEmpty()){
                 throw new Exception("Please list games before trying to join");
             }
-            int ID = games.get(Integer.parseInt(params[1]));
         } catch (NumberFormatException e) {
             throw new Exception("There is no game with that id");
         }
         if (params[0] == "black"){
-            server.joinGame(Integer.parseInt(params[1]), params[0], token);
+            int ID = games.get(Integer.parseInt(params[0]));
+            server.joinGame(ID, params[1], token);
+
         } else if (params[0] == "white"){
-            server.joinGame(Integer.parseInt(params[1]), params[0], token);
+            server.joinGame(Integer.parseInt(params[0]), params[1], token);
+            makewhiteboard();
         }
         return "{}";
     }
@@ -133,6 +139,7 @@ public class ClientLoop {
         return "You logged in as " + auth.username();
 
     }
+
     private String register(String[] params) throws Exception{
         verifyPreLoginStatus();
         if(params.length != 3){
@@ -187,12 +194,14 @@ public class ClientLoop {
         }
     }
 
-    board boar = new board();
-
     public void makewhiteboard(){
-    boar.drawWhite();
+        board.drawWhite();
     }
     public void makeblackboard(){
-        boar.drawBlack();
+        board.drawBlack();
+    }
+
+    public State getstate() {
+        return status;
     }
 }

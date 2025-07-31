@@ -9,10 +9,12 @@ import static java.awt.Color.GREEN;
 public class Repl {
     //initializing objects from loops
     private final ClientLoop client;
+    private State status = PRELOGIN;
 
     //contructor
     public Repl(String serverUrl) {
         this.client = new ClientLoop(serverUrl);
+
 
     }
     public void run(){
@@ -26,14 +28,17 @@ public class Repl {
         var result = "";
         // evaluating first input
         while (!result.equals("quit")) {
-            printPrompt();
+            printPrompt(status);
             String line = scanner.nextLine();
             try {
                 //System.out.print(line);
                 //the evaluation of the input is going to give back a string,
                 // which is going to be the response from the server
                 result = client.eval(line);
+                this.status = client.getstate();
                 System.out.print(result);
+                System.out.print('\n');
+
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -41,7 +46,7 @@ public class Repl {
         }
         System.out.println();
     }
-    private void printPrompt() {
-        System.out.print("\n" + PRELOGIN + ">>> ");    }
+    private void printPrompt(State status) {
+        System.out.print("\n" + status + ">>> ");    }
 
 }

@@ -15,14 +15,12 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    // === Register ===
     public AuthData register(String username, String password, String email) throws Exception {
         var request = new UserData(username, password, email);
         var json = makeRequest("/user", "POST", request, null);
         return new Gson().fromJson(json, AuthData.class);
     }
 
-    // === Login ===
     public AuthData login(String username, String password) throws Exception {
         // email is ignored for login
         var request = new UserData(username, password, null);
@@ -30,12 +28,10 @@ public class ServerFacade {
         return new Gson().fromJson(json, AuthData.class);
     }
 
-    // === Logout ===
     public void logout(String authToken) throws Exception {
         makeRequest("/session", "DELETE", null, authToken);
     }
 
-    // === List Games ===
     public List<GameData> listGames(String authToken) throws Exception {
         var json = makeRequest("/game", "GET", null, authToken);
         var obj = JsonParser.parseString(json).getAsJsonObject();
@@ -44,26 +40,23 @@ public class ServerFacade {
         return Arrays.asList(games);
     }
 
-    // === Create Game ===
-    public int createGame(String gameName) throws Exception {
+    public int createGame(String gameName, String authToken) throws Exception {
         var request = Map.of("gameName", gameName);
-        var json = makeRequest("/game", "POST", request, null);
+        var json = makeRequest("/game", "POST", request, authToken);
         var obj = JsonParser.parseString(json).getAsJsonObject();
         return obj.get("gameID").getAsInt();
     }
 
-    // === Join Game ===
     public void joinGame(int gameID, String playerColor, String authToken) throws Exception {
         var request = Map.of("playerColor", playerColor, "gameID", gameID);
         makeRequest("/game", "PUT", request, authToken);
     }
 
-    // === Clear ===
     public void clear() throws Exception {
         makeRequest("/db", "DELETE", null, null);
     }
 
-    // === Core HTTP handler ===
+    // handling requests
     private String makeRequest(String path, String method, Object body, String authToken) throws Exception {
         URL url = new URL(serverUrl + path);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
