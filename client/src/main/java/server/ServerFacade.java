@@ -45,9 +45,9 @@ public class ServerFacade {
     }
 
     // === Create Game ===
-    public int createGame(String gameName, String authToken) throws Exception {
+    public int createGame(String gameName) throws Exception {
         var request = Map.of("gameName", gameName);
-        var json = makeRequest("/game", "POST", request, authToken);
+        var json = makeRequest("/game", "POST", request, null);
         var obj = JsonParser.parseString(json).getAsJsonObject();
         return obj.get("gameID").getAsInt();
     }
