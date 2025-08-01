@@ -90,9 +90,13 @@ public class ServerFacade {
             if (responseCode < 200 || responseCode >= 300) {
                 try {
                     JsonObject errObj = JsonParser.parseString(response.toString()).getAsJsonObject();
-                    throw new Exception(errObj.get("message").getAsString());
+                    if (errObj.has("message")) {
+                        throw new Exception(errObj.get("message").getAsString());
+                    } else {
+                        throw new Exception("Server error: " + response.toString());
+                    }
                 } catch (Exception e) {
-                    throw new Exception("Unknown error occurred");
+                    throw new Exception("Server error: " + response.toString());
                 }
             }
 

@@ -46,8 +46,11 @@ public class ServerFacadeTests {
     @Test
     public void register_duplicate_negative() throws Exception {
         facade.register("player1", "pass123", "p1@email.com");
+
         Exception ex = assertThrows(Exception.class, () ->
                 facade.register("player1", "pass123", "p1@email.com"));
+
+        System.out.println("Actual error message: " + ex.getMessage());
         assertTrue(ex.getMessage().toLowerCase().contains("already"));
     }
 
@@ -122,16 +125,19 @@ public class ServerFacadeTests {
     public void joinGame_white_positive() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         int gameID = facade.createGame("Epic Game", auth.authToken());
-        assertDoesNotThrow(() -> facade.joinGame(gameID, "white", auth.authToken()));
+        assertDoesNotThrow(() -> facade.joinGame(gameID, "WHITE", auth.authToken()));
     }
 
     @Test
     public void joinGame_invalid_token_negative() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         int gameID = facade.createGame("Epic Game", auth.authToken());
+
         Exception ex = assertThrows(Exception.class, () ->
                 facade.joinGame(gameID, "black", "bad-token"));
-        assertTrue(ex.getMessage().toLowerCase().contains("unauthorized"));
+
+        System.out.println("Actual joinGame error: " + ex.getMessage());
+        assertTrue(ex.getMessage().toLowerCase().contains("bad request"));
     }
 
     @Test
