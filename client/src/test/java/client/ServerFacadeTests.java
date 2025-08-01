@@ -146,3 +146,4 @@ public class ServerFacadeTests {
                 ex.getMessage().toLowerCase().contains("bad"));
     }
 }
+

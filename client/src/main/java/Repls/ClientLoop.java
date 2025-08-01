@@ -101,7 +101,7 @@ public class ClientLoop {
         if (color.equals("black")) {
             server.joinGame(gameID, "BLACK", token);
             board.drawBlack();
-            
+
             return "Joined game as black.";
         } else if (color.equals("white")) {
             server.joinGame(gameID, "WHITE", token);
