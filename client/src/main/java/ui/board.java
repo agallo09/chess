@@ -59,9 +59,11 @@ public class board {
     private void printBlackBoard(String[][] rowArray, PrintStream output) {
         for (int rowNumber = 9; rowNumber >= 0; rowNumber--) {
             String[] row = rowArray[rowNumber];
+            
             if (rowNumber == 0 || rowNumber == 9) {
                 row = new String[] {" ", "h", "g", "f", "e", "d", "c", "b", "a", " "};
             }
+
             printRow(output, row, 9 - rowNumber);
         }
     }
@@ -115,6 +117,7 @@ public class board {
 
             output.print(bg + " " + fg + piece + " ");
             tileNumber++;
+
         }
     }
 }
