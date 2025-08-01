@@ -1,9 +1,7 @@
-package Repls;
+package repls;
 import java.util.Scanner;
 
-import static Repls.State.PRELOGIN;
-import static java.awt.Color.BLUE;
-import static java.awt.Color.GREEN;
+import static repls.State.PRELOGIN;
 
 public class Repl {
     //initializing objects from loops

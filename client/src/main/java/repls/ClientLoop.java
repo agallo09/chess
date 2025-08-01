@@ -1,12 +1,12 @@
-package Repls;
+package repls;
 import model.*;
 import server.ServerFacade;
 import java.util.Arrays;
 import java.util.*;
-import static Repls.State.PRELOGIN;
-import static Repls.State.POSTLOGIN;
-import static Repls.State.GAMESTATUS;
-import ui.board;
+import static repls.State.PRELOGIN;
+import static repls.State.POSTLOGIN;
+
+import ui.Board;
 
 
 
@@ -15,7 +15,7 @@ public class ClientLoop {
     private ServerFacade server;
     private State status = PRELOGIN;
     private final Map<Integer,Integer> games = new HashMap<>();
-    private board board = new board();
+    private Board board = new Board();
 
 
 

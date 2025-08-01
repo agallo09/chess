@@ -35,14 +35,14 @@ public class ServerFacadeTests {
     // ---- REGISTER ----
 
     @Test
-    public void register_positive() throws Exception {
+    public void registerPositive() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         assertNotNull(auth.authToken());
         assertEquals("player1", auth.username());
     }
 
     @Test
-    public void register_duplicate_negative() throws Exception {
+    public void registerDuplicateNegative() throws Exception {
         facade.register("player1", "pass123", "p1@email.com");
 
         Exception ex = assertThrows(Exception.class, () ->
@@ -55,7 +55,7 @@ public class ServerFacadeTests {
     // ---- LOGIN ----
 
     @Test
-    public void login_positive() throws Exception {
+    public void loginPositive() throws Exception {
         facade.register("player1", "pass123", "p1@email.com");
         AuthData auth = facade.login("player1", "pass123");
         assertEquals("player1", auth.username());
@@ -63,7 +63,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void login_wrong_password_negative() throws Exception {
+    public void loginWrongPasswordNegative() throws Exception {
         facade.register("player1", "pass123", "p1@email.com");
         Exception ex = assertThrows(Exception.class, () ->
                 facade.login("player1", "wrongpass"));
@@ -73,13 +73,13 @@ public class ServerFacadeTests {
     // ---- LOGOUT ----
 
     @Test
-    public void logout_positive() throws Exception {
+    public void logoutPositive() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         assertDoesNotThrow(() -> facade.logout(auth.authToken()));
     }
 
     @Test
-    public void logout_invalid_token_negative() {
+    public void logoutInvalidTokenNegative() {
         Exception ex = assertThrows(Exception.class, () -> facade.logout("bad-token"));
         assertTrue(ex.getMessage().toLowerCase().contains("unauthorized"));
     }
@@ -87,14 +87,14 @@ public class ServerFacadeTests {
     // ---- CREATE GAME ----
 
     @Test
-    public void createGame_positive() throws Exception {
+    public void createGamePositive() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         int gameID = facade.createGame("My Game", auth.authToken());
         assertTrue(gameID > 0);
     }
 
     @Test
-    public void createGame_invalid_token_negative() {
+    public void createGameInvalidTokenNegative() {
         Exception ex = assertThrows(Exception.class, () ->
                 facade.createGame("My Game", "bad-token"));
         assertTrue(ex.getMessage().toLowerCase().contains("unauthorized"));
@@ -103,7 +103,7 @@ public class ServerFacadeTests {
     // ---- LIST GAMES ----
 
     @Test
-    public void listGames_positive() throws Exception {
+    public void listGamesPositive() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         facade.createGame("First Game", auth.authToken());
         List<GameData> games = facade.listGames(auth.authToken());
@@ -112,7 +112,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGames_invalid_token_negative() {
+    public void listGamesInvalidTokenNegative() {
         Exception ex = assertThrows(Exception.class, () -> facade.listGames("bad-token"));
         assertTrue(ex.getMessage().toLowerCase().contains("unauthorized"));
     }
@@ -120,14 +120,14 @@ public class ServerFacadeTests {
     // ---- JOIN GAME ----
 
     @Test
-    public void joinGame_white_positive() throws Exception {
+    public void joinGameWhitePositive() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         int gameID = facade.createGame("Epic Game", auth.authToken());
         assertDoesNotThrow(() -> facade.joinGame(gameID, "WHITE", auth.authToken()));
     }
 
     @Test
-    public void joinGame_invalid_token_negative() throws Exception {
+    public void joinGameInvalidTokenNegative() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         int gameID = facade.createGame("Epic Game", auth.authToken());
 
@@ -139,7 +139,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void joinGame_nonexistent_game_negative() throws Exception {
+    public void joinGameNonexistentGameNegative() throws Exception {
         AuthData auth = facade.register("player1", "pass123", "p1@email.com");
         Exception ex = assertThrows(Exception.class, () ->
                 facade.joinGame(9999, "white", auth.authToken()));

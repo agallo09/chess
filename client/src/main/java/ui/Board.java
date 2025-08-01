@@ -3,7 +3,7 @@ package ui;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-public class board {
+public class Board {
 
     public void drawWhite() {
         PrintStream output = new PrintStream(System.out, true, StandardCharsets.UTF_8);

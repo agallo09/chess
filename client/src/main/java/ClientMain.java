@@ -1,5 +1,5 @@
 import chess.*;
-import Repls.Repl;
+import repls.Repl;
 
 public class ClientMain {
 

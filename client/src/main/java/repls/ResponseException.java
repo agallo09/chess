@@ -1,4 +1,4 @@
-package Repls;
+package repls;
 
 public class ResponseException extends Exception {
     public ResponseException(String message) {
