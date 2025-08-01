@@ -63,14 +63,14 @@ public class ClientLoop {
         if(games1.isEmpty()){
             return "No games created. Type 'help' to see commands";
         }
+        // change not list ID
         int i = 1;
         for (GameData game : games1) {
             games.put(i, game.gameID());
             output.append(String.format(
-                    "%d. Name: %s  ,Id: %s  , White: %s  , Black: %s%n",
+                    "%d. Name: %s  , White: %s  , Black: %s%n",
                     i++,
                     game.gameName(),
-                    game.gameID(),
                     game.whiteUsername() != null ? game.whiteUsername() : "none",
                     game.blackUsername() != null ? game.blackUsername() : "none"
             ));
@@ -117,13 +117,10 @@ public class ClientLoop {
         if(params.length != 1){
             throw new Exception("invalid input, try again.");
         }
-        try {
-            if(games.isEmpty()){
-                throw new Exception("No games listed");
-            }
-            int id = games.get(Integer.parseInt(params[0]));
-        } catch (NumberFormatException e) {
-            throw new Exception("Invalid game id");
+        int index = Integer.parseInt(params[0]);
+        // change
+        if (index < 0 || index > games.size()) {
+            throw new Exception("No game with that ID.");
         }
         board.drawWhite();
         return "board";

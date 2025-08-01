@@ -61,7 +61,16 @@ public class Board {
             String[] row = rowArray[rowNumber];
 
             if (rowNumber == 0 || rowNumber == 9) {
+                // Flip file labels (a-h)
                 row = new String[] {" ", "h", "g", "f", "e", "d", "c", "b", "a", " "};
+            } else if (rowNumber == 1 || rowNumber == 8) {
+                // Black back rank (row 1) or white back rank (row 8)
+                row = row.clone();
+
+                // Swap columns 4 and 5 (king <-> queen)
+                String temp = row[4];
+                row[4] = row[5];
+                row[5] = temp;
             }
 
             printRow(output, row, 9 - rowNumber);

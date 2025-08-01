@@ -88,15 +88,30 @@ public class ServerFacade {
             }
 
             if (responseCode < 200 || responseCode >= 300) {
+                String raw = response.toString().trim();
                 try {
-                    JsonObject errObj = JsonParser.parseString(response.toString()).getAsJsonObject();
-                    if (errObj.has("message")) {
-                        throw new Exception(errObj.get("message").getAsString());
-                    } else {
-                        throw new Exception("Server error: " + response.toString());
+                    JsonObject errObj = JsonParser.parseString(raw).getAsJsonObject();
+                    String message = errObj.has("message") ? errObj.get("message").getAsString() : "Unknown server error.";
+
+                    while (message.startsWith("Error: ")) {
+                        message = message.substring("Error: ".length()).trim();
                     }
-                } catch (Exception e) {
-                    throw new Exception("Server error: " + response.toString());
+
+                    throw new Exception("Error: " + message);
+                } catch (Exception parseEx) {
+                    if (raw.contains("\"message\"")) {
+                        int start = raw.indexOf("\"message\"") + 9;
+                        int quoteStart = raw.indexOf("\"", start);
+                        int quoteEnd = raw.indexOf("\"", quoteStart + 1);
+                        String message = raw.substring(quoteStart + 1, quoteEnd);
+
+                        while (message.startsWith("Error: ")) {
+                            message = message.substring("Error: ".length()).trim();
+                        }
+
+                        throw new Exception("Error: " + message);
+                    }
+                    throw new Exception("Error: " + raw);
                 }
             }
 
