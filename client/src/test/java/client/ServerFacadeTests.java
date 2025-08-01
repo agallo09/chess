@@ -1,3 +1,4 @@
+package client;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
