@@ -2,7 +2,6 @@ package Repls;
 import java.util.Scanner;
 
 import static Repls.State.PRELOGIN;
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.Constants.RESET;
 import static java.awt.Color.BLUE;
 import static java.awt.Color.GREEN;
 
