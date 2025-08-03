@@ -50,7 +50,7 @@ public class ClientLoop {
             throw new Exception("invalid input, try again.");
         }
         Integer id = server.createGame(params[0], token);
-        return "Game " + id + " created";
+        return "Game created";
     }
 
     private String list(String[] params) throws Exception {
