@@ -1,4 +1,4 @@
-package websocket;
+package sahredWebsocket;
 
 public class WebSocketManager {
 }

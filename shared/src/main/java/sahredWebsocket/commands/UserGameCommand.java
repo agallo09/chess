@@ -1,4 +1,4 @@
-package websocket.commands;
+package sahredWebsocket.commands;
 
 import java.util.Objects;
 

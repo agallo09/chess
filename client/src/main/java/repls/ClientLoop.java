@@ -1,15 +1,14 @@
 package repls;
 import model.*;
-import websocket.*;
-
 import server.ServerFacade;
+
 import java.util.Arrays;
 import java.util.*;
 import static repls.State.PRELOGIN;
 import static repls.State.POSTLOGIN;
+import static repls.State.GAMESTATUS;
 
 import ui.Board;
-
 
 
 public class ClientLoop {
@@ -18,7 +17,8 @@ public class ClientLoop {
     private State status = PRELOGIN;
     private final Map<Integer,Integer> games = new HashMap<>();
     private Board board = new Board();
-    private WebSocketClientManager wsManager;
+    private websocket.WebSocketClientManager wsManager;
+    private websocket.NotificationHandler notificationHandler;
 
 
     public ClientLoop(String serverUrl) {
@@ -104,11 +104,8 @@ public class ClientLoop {
         }
 
         // Use WebSocket to join the game
-        wsManager.connect();  // open connection if not already opened
-        wsManager.sendConnectCommand(gameID, token, color);
-
-        // The server will send back LOAD_GAME message and your WebSocketClientManager
-        // should handle the redraw when it receives that message asynchronously.
+        wsManager = new websocket.WebSocketClientManager(server, notificationHandler);
+        wsManager.joinGame(params[0], params[1]);
 
         return "Joined game as " + color + ". Waiting for game state...";
     }
@@ -125,8 +122,8 @@ public class ClientLoop {
 
         int gameID = games.get(gameNumber);
 
-        wsManager.connect();
-        wsManager.sendConnectCommand(gameID, token, "observer");
+        wsManager = new websocket.WebSocketClientManager(server, notificationHandler);
+        wsManager.observeGame(params[0], params[1]);
 
         return "Observing game. Waiting for game state...";
     }
@@ -184,6 +181,15 @@ public class ClientLoop {
                     logout - when you are done
                     quit - playing chess
                     help - with possible commands
+                    """;
+        }
+        if (status == GAMESTATUS) {
+            return """
+                    Make a move: "move" <source> <destination> <optional promotion>(e.g. f5 e4 q)
+                    Redraw Board: "redraw"
+                    Change color :"colors" <color number>
+                    Resign from game: "resign"
+                    Leave game: "leave"
                     """;
         }
         else{
