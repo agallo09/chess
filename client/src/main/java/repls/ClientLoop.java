@@ -91,7 +91,6 @@ public class ClientLoop {
         } catch (NumberFormatException e) {
             throw new Exception("Invalid game number. Must be an integer.");
         }
-
         if (!games.containsKey(gameNumber)) {
             throw new Exception("Game not found. Please use 'list' to see available games.");
         }
