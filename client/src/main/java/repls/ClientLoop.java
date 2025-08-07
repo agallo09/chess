@@ -1,5 +1,7 @@
 package repls;
 import model.*;
+import websocket.*;
+
 import server.ServerFacade;
 import java.util.Arrays;
 import java.util.*;
@@ -16,7 +18,7 @@ public class ClientLoop {
     private State status = PRELOGIN;
     private final Map<Integer,Integer> games = new HashMap<>();
     private Board board = new Board();
-
+    private WebSocketClientManager wsManager;
 
 
     public ClientLoop(String serverUrl) {
@@ -94,21 +96,21 @@ public class ClientLoop {
         if (!games.containsKey(gameNumber)) {
             throw new Exception("Game not found. Please use 'list' to see available games.");
         }
-        //join by color
+        //check color
         int gameID = games.get(gameNumber);
         String color = params[1].toLowerCase();
-        if (color.equals("black")) {
-            server.joinGame(gameID, "BLACK", token);
-            board.drawBlack();
-
-            return "Joined game as black.";
-        } else if (color.equals("white")) {
-            server.joinGame(gameID, "WHITE", token);
-            board.drawWhite();
-            return "Joined game as white.";
-        } else {
+        if (!color.equals("black") && !color.equals("white")) {
             throw new Exception("Invalid color. Must be 'white' or 'black'.");
         }
+
+        // Use WebSocket to join the game
+        wsManager.connect();  // open connection if not already opened
+        wsManager.sendConnectCommand(gameID, token, color);
+
+        // The server will send back LOAD_GAME message and your WebSocketClientManager
+        // should handle the redraw when it receives that message asynchronously.
+
+        return "Joined game as " + color + ". Waiting for game state...";
     }
 
     private String observe(String[] params) throws Exception {
@@ -116,13 +118,17 @@ public class ClientLoop {
         if(params.length != 1){
             throw new Exception("invalid input, try again.");
         }
-        int index = Integer.parseInt(params[0]);
-        // change
-        if (index < 0 || index > games.size()) {
-            throw new Exception("No game with that ID.");
+        int gameNumber = Integer.parseInt(params[0]);
+        if (!games.containsKey(gameNumber)) {
+            throw new Exception("Game not found. Please use 'list' to see available games.");
         }
-        board.drawWhite();
-        return "board";
+
+        int gameID = games.get(gameNumber);
+
+        wsManager.connect();
+        wsManager.sendConnectCommand(gameID, token, "observer");
+
+        return "Observing game. Waiting for game state...";
     }
 
     private String logout(String[] params) throws Exception {
