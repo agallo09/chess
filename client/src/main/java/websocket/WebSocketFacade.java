@@ -2,20 +2,20 @@
 package websocket;
 import com.google.gson.Gson;
 import repls.ResponseException;
-import server.ServerFacade;
+
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 //need to extend Endpoint for websocket to work properly
-public class WebSocketClientManager extends Endpoint {
+public class WebSocketFacade extends Endpoint {
 
     //fields
     Session session;
     NotificationHandler notificationHandler;
 
-    public WebSocketClientManager(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -43,10 +43,10 @@ public class WebSocketClientManager extends Endpoint {
     }
 
 
-    public void joinGame(String color, String gameId) {
-        server.joinGame(authToken, gameID);
-        this.ws = new WebSocketFacade(serverUrl, notificationHandler);
-        this.ws.connect(authToken, gameID);
+    public void joinGame(String gameId, String color, String authToken) {
+        var action = new Action(Action.Type.JOIN_PLAYER, gameId, color, authToken);
+        String json = new Gson().toJson(action);
+        this.session.getAsyncRemote().sendText(json);
     }
 
     public void observeGame(String param, String param1) {

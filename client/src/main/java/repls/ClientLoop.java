@@ -9,20 +9,24 @@ import static repls.State.POSTLOGIN;
 import static repls.State.GAMESTATUS;
 
 import ui.Board;
+import websocket.WebSocketFacade;
 
 
 public class ClientLoop {
     String token = null;
     private ServerFacade server;
+    String serverUrl;
     private State status = PRELOGIN;
     private final Map<Integer,Integer> games = new HashMap<>();
     private Board board = new Board();
-    private websocket.WebSocketClientManager wsManager;
+    // websocket facade object
+    private WebSocketFacade wsManager;
     private websocket.NotificationHandler notificationHandler;
 
 
     public ClientLoop(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
     }
 
     public String eval(String input) {
@@ -82,31 +86,34 @@ public class ClientLoop {
     }
 
     private String join(String[] params) throws Exception  {
+        //verify status
         verifyPostLoginStatus();
+        // check inout valid
         if(params.length != 2){
             throw new Exception("invalid input, try again.");
         }
         // check if the game exists first
         int gameNumber;
+        //check if input is a number
         try {
             gameNumber = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
             throw new Exception("Invalid game number. Must be an integer.");
         }
+        //check if game exists
         if (!games.containsKey(gameNumber)) {
             throw new Exception("Game not found. Please use 'list' to see available games.");
         }
-        //check color
         int gameID = games.get(gameNumber);
+        //check valid color
         String color = params[1].toLowerCase();
         if (!color.equals("black") && !color.equals("white")) {
             throw new Exception("Invalid color. Must be 'white' or 'black'.");
         }
-
         // Use WebSocket to join the game
-        wsManager = new websocket.WebSocketClientManager(server, notificationHandler);
-        wsManager.joinGame(params[0], params[1]);
-
+        wsManager = new WebSocketFacade(serverUrl, notificationHandler);
+        wsManager.joinGame(params[0], params[1], token);
+        status = State.GAMESTATUS;
         return "Joined game as " + color + ". Waiting for game state...";
     }
 
@@ -122,9 +129,9 @@ public class ClientLoop {
 
         int gameID = games.get(gameNumber);
 
-        wsManager = new websocket.WebSocketClientManager(server, notificationHandler);
-        wsManager.observeGame(params[0], params[1]);
-
+        wsManager = new WebSocketFacade(serverUrl, notificationHandler);
+        wsManager.observeGame(params[0], token);
+        status = State.GAMESTATUS;
         return "Observing game. Waiting for game state...";
     }
 
@@ -203,13 +210,18 @@ public class ClientLoop {
     // first we verify they have logged in or register
 
     private void verifyPreLoginStatus() throws Exception {
-        if (status == POSTLOGIN){
+        if (status != PRELOGIN){
             throw new Exception("Wrong action, you are already signed in.");
         }
     }
 
     private void verifyPostLoginStatus() throws Exception {
-        if (status == PRELOGIN){
+        if (status != POSTLOGIN){
+            throw new Exception("Wrong action, you have to register or log in first.");
+        }
+    }
+    private void verifyGameStatus() throws Exception {
+        if (status != GAMESTATUS){
             throw new Exception("Wrong action, you have to register or log in first.");
         }
     }
