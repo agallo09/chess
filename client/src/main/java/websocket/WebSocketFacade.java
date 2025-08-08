@@ -22,6 +22,7 @@ public class WebSocketFacade extends Endpoint {
     private NotificationHandler notificationHandler;
     private final Gson gson = new Gson();
     private String gameId;
+    private NotificationHandler handler;
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
@@ -43,9 +44,11 @@ public class WebSocketFacade extends Endpoint {
         switch (messageType) {
             case NOTIFICATION -> {
                 Notification notificationMessage = new Gson().fromJson(message, Notification.class);
+                 handler.notify(notificationMessage);
             }
             case ERROR -> {
                 Error errorMessage = new Gson().fromJson(message, Error.class);
+                handler.notify(errorMessage);
             }
             case LOAD_GAME -> {
                 loadGameHandler(message);
@@ -77,7 +80,7 @@ public class WebSocketFacade extends Endpoint {
     }
 
 
-    public void makeMove(String token, String gameId, String source, String destination, String promotion) {
+    public void makeMove(String token, String source, String destination, String promotion) {
         // making the chess move object to pass
         ChessPosition from = toPosition(source);
         ChessPosition to = toPosition(destination);
