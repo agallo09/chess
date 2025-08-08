@@ -1,6 +1,7 @@
 package websocket;
 
+import sahredWebsocket.messages.ServerMessage;
 
 public interface NotificationHandler {
-    void notify(NotificationHandler message);
+    void notify(ServerMessage message);
 }

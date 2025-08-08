@@ -1,77 +1,144 @@
-
 package websocket;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPiece.PieceType;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import repls.ResponseException;
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import sahredWebsocket.messages.*;
+import sahredWebsocket.commands.*;
+import sahredWebsocket.messages.Error;
+import com.google.gson.Gson;
 
 //need to extend Endpoint for websocket to work properly
 public class WebSocketFacade extends Endpoint {
 
     //fields
-    Session session;
-    NotificationHandler notificationHandler;
+    private final Session session;
+    private NotificationHandler notificationHandler;
+    private final Gson gson = new Gson();
+    private String gameId;
 
-    // constructor
     public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             this.notificationHandler = notificationHandler;
-
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
-
-            //set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    NotificationHandler notification = new Gson().fromJson(message, NotificationHandler.class);
-                    notificationHandler.notify(notification);
-                }
-            });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
     }
+
+    // adding message handler
+    @OnMessage
+    public void onMessage(String message) {
+        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+        var messageType = serverMessage.getServerMessageType();
+        switch (messageType) {
+            case NOTIFICATION -> {
+                Notification notificationMessage = new Gson().fromJson(message, Notification.class);
+            }
+            case ERROR -> {
+                Error errorMessage = new Gson().fromJson(message, Error.class);
+            }
+            case LOAD_GAME -> {
+                loadGameHandler(message);
+            }
+        }
+    }
+
     //Endpoint requires this method, but you don't have to do anything
-    @Override
+    @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
     public void joinGame(String gameId, String color, String authToken) {
-        var action = new Action(Action.Type.JOIN_PLAYER, gameId, color, authToken);
-        String json = new Gson().toJson(action);
+        // Create a command with CONNECT type to join the game
+        this.gameId = gameId;
+        Connect command = new Connect(UserGameCommand.CommandType.CONNECT, authToken,Integer.parseInt(gameId), color);
+        // Convert command to JSON
+        String json = new Gson().toJson(command);
+        // Send JSON command via WebSocket asynchronously
         this.session.getAsyncRemote().sendText(json);
     }
 
-    public void observeGame(String param, String param1) {
+    public void observeGame(String gameId, String token) {
+        Connect command = new Connect(UserGameCommand.CommandType.CONNECT, token,Integer.parseInt(gameId), null);// convert gameId String to Integer);
+        // Convert command to JSON
+        String json = new Gson().toJson(command);
+        // Send JSON command via WebSocket asynchronously
+        this.session.getAsyncRemote().sendText(json);
     }
 
-    private void send(String message) {
-        try {
-            session.getBasicRemote().sendText(message);
-        } catch (IOException e) {
-            throw new RuntimeException("WebSocket send failed: " + e.getMessage());
-        }
-    }
 
-    public void makeMove(String token, String source, String destination, String promotion) {
-
+    public void makeMove(String token, String gameId, String source, String destination, String promotion) {
+        // making the chess move object to pass
+        ChessPosition from = toPosition(source);
+        ChessPosition to = toPosition(destination);
+        PieceType promoPiece = toPieceType(promotion);
+        ChessMove move = new ChessMove(from, to, promoPiece);
+        //make move command object
+        MakeMove command = new MakeMove(
+                UserGameCommand.CommandType.MAKE_MOVE, token, Integer.parseInt(gameId), move);
+        //calling the method of the websocket
+        String json = new Gson().toJson(command);
+        this.session.getAsyncRemote().sendText(json);
     }
 
     public void legalMoves(String token, String source) {
-
+    // making the source to a chess position
+        ChessPosition position = toPosition(source);
+        //make move command object
+        LegalMoves command = new LegalMoves(
+                UserGameCommand.CommandType.LEGAL_MOVES, token, Integer.parseInt(gameId), position);
+        //calling the method of the websocket
+        String json = new Gson().toJson(command);
+        this.session.getAsyncRemote().sendText(json);
     }
 
     public void resign(String token) {
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.RESIGN, token, Integer.parseInt(gameId));
+        //calling the method of the websocket
+        String json = new Gson().toJson(command);
+        this.session.getAsyncRemote().sendText(json);
     }
 
     public void redrawBoard(String token) {
+
     }
 
     public void leave(String token) {
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.LEAVE, token, Integer.parseInt(gameId));
+        //calling the method of the websocket
+        String json = new Gson().toJson(command);
+        this.session.getAsyncRemote().sendText(json);
     }
+    //helping methods
+    private void loadGameHandler(String message) {
+    }
+    private ChessPosition toPosition(String pos) {
+        int col = pos.charAt(0) - 'a';     // 'a'->0, 'b'->1, ..., 'h'->7
+        int row = 8 - (pos.charAt(1) - '0'); // '1'->7, '8'->0 if row 0 is top rank 8
+        return new ChessPosition(row, col);
+    }
+    private PieceType toPieceType(String promo) {
+        if (promo == null) return null; // no promotion
+        switch (promo.toLowerCase()) {
+            case "q": return PieceType.QUEEN;
+            case "r": return PieceType.ROOK;
+            case "b": return PieceType.BISHOP;
+            case "n": return PieceType.KNIGHT;
+            default: return null; // or throw exception for invalid promo
+        }
+    }
+
+
 }

@@ -3,7 +3,6 @@ import com.google.gson.*;
 import model.AuthData;
 import model.UserData;
 import model.GameData;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;

@@ -10,7 +10,6 @@ import java.util.Objects;
  */
 public class ChessPosition {
     private final int row;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

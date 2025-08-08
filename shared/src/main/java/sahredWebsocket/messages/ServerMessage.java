@@ -1,5 +1,7 @@
 package sahredWebsocket.messages;
 
+import chess.ChessGame;
+
 import java.util.Objects;
 
 /**
