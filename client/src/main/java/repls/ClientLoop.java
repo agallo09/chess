@@ -7,6 +7,8 @@ import java.util.*;
 import static repls.State.PRELOGIN;
 import static repls.State.POSTLOGIN;
 import static repls.State.GAMESTATUS;
+import static repls.State.OBSERVER;
+
 
 import ui.Board;
 import websocket.WebSocketFacade;
@@ -14,11 +16,11 @@ import websocket.WebSocketFacade;
 
 public class ClientLoop {
     String token = null;
-    private ServerFacade server;
+    private final ServerFacade server;
     String serverUrl;
     private State status = PRELOGIN;
     private final Map<Integer,Integer> games = new HashMap<>();
-    private Board board = new Board();
+    private final Board board = new Board();
     // websocket facade object
     private WebSocketFacade wsManager;
     private websocket.NotificationHandler notificationHandler;
@@ -28,7 +30,7 @@ public class ClientLoop {
         this.server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
     }
-
+    // evaluating the input
     public String eval(String input) {
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -44,10 +46,10 @@ public class ClientLoop {
                 case "observe" -> observe(params);
                 case "quit" -> "quit";
                 case "move" -> makeMove(params);
-                case "redraw" -> redrawBoard();
+                case "redraw" -> redrawBoard(params);
                 case "legal" -> legalMoves(params);
-                case "resign" -> resign();
-                case "leave" -> leave();
+                case "resign" -> resign(params);
+                case "leave" -> leave(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -55,8 +57,52 @@ public class ClientLoop {
         }
     }
 
-    private String redrawBoard() {
-        return null;
+    private String leave(String[] params) throws Exception{
+        verifyGameStatus();
+        if (params.length != 0) {
+            throw new Exception("Usage: move <source> <destination> [promotion]");
+        }
+        //websocket call method
+        wsManager.leave(token);
+        return "You just resigned.";
+    }
+
+    private String resign(String[] params) throws Exception{
+        verifyGameStatus();
+        if (params.length != 0) {
+            throw new Exception("Usage: move <source> <destination> [promotion]");
+        }
+        //websocket call method
+        wsManager.resign(token);
+        return "You just resigned.";
+    }
+
+    private String legalMoves(String[] params) throws Exception {
+        verifyGameStatus();
+        if (params.length != 1) {
+            throw new Exception("Usage: move <source> <destination> [promotion]");
+        }
+        //fielding
+        String source = params[0].toLowerCase();
+        // check source
+        if (!source.matches("^[a-h][1-8]$")) {
+            throw new Exception("Invalid source square: must be from a1 to h8.");
+        }
+        //websocket method call
+        wsManager.legalMoves(token, source);
+        return "You will see the legal moves on the board for piece on: " + source;
+
+
+    }
+
+    private String redrawBoard(String[] params) throws Exception{
+        verifyGameStatus();
+        if (params.length != 0) {
+            throw new Exception("Usage: move <source> <destination> [promotion]");
+        }
+        //websocket call method
+        wsManager.redrawBoard(token);
+        return "Board redraw.";
     }
 
     private String create(String[] params) throws Exception {
@@ -140,7 +186,7 @@ public class ClientLoop {
 
         wsManager = new WebSocketFacade(serverUrl, notificationHandler);
         wsManager.observeGame(params[0], token);
-        status = State.GAMESTATUS;
+        status = State.OBSERVER;
         return "Observing game. Waiting for game state...";
     }
 
@@ -211,7 +257,7 @@ public class ClientLoop {
 
     }
 
-
+    // help messages depending on the status
     public String help() {
         if (status == PRELOGIN) {
             return """
@@ -241,6 +287,11 @@ public class ClientLoop {
                     Leave game: "leave"
                     """;
         }
+        if (status == OBSERVER) {
+            return """
+                    Leave game: "leave"
+                    """;
+        }
         else{
             return """
                     quit - playing chess
@@ -248,26 +299,26 @@ public class ClientLoop {
                     """;
         }
     }
-    // status verification for the 3 levels,
-    // first we verify they have logged in or register
 
+
+    // status verification
     private void verifyPreLoginStatus() throws Exception {
         if (status != PRELOGIN){
             throw new Exception("Wrong action, you are already signed in.");
         }
     }
-
     private void verifyPostLoginStatus() throws Exception {
         if (status != POSTLOGIN){
             throw new Exception("Wrong action, you have to register or log in first.");
         }
     }
     private void verifyGameStatus() throws Exception {
-        if (status != GAMESTATUS){
-            throw new Exception("Wrong action, you have to register or log in first.");
+        if (status != GAMESTATUS ||status != OBSERVER ){
+            throw new Exception("Wrong action, you have to register or log in first, and join or observe a game.");
         }
     }
 
+    //status report
     public State getstate() {
         return status;
     }

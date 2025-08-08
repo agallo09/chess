@@ -2,7 +2,6 @@
 package websocket;
 import com.google.gson.Gson;
 import repls.ResponseException;
-
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -15,6 +14,7 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
 
+    // constructor
     public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
             url = url.replace("http", "ws");
@@ -36,7 +36,6 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
@@ -61,5 +60,18 @@ public class WebSocketFacade extends Endpoint {
 
     public void makeMove(String token, String source, String destination, String promotion) {
 
+    }
+
+    public void legalMoves(String token, String source) {
+
+    }
+
+    public void resign(String token) {
+    }
+
+    public void redrawBoard(String token) {
+    }
+
+    public void leave(String token) {
     }
 }
