@@ -42,7 +42,6 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-
     public void joinGame(String gameId, String color, String authToken) {
         var action = new Action(Action.Type.JOIN_PLAYER, gameId, color, authToken);
         String json = new Gson().toJson(action);
@@ -58,5 +57,9 @@ public class WebSocketFacade extends Endpoint {
         } catch (IOException e) {
             throw new RuntimeException("WebSocket send failed: " + e.getMessage());
         }
+    }
+
+    public void makeMove(String token, String source, String destination, String promotion) {
+
     }
 }

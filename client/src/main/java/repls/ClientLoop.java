@@ -43,11 +43,20 @@ public class ClientLoop {
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "quit" -> "quit";
+                case "move" -> makeMove(params);
+                case "redraw" -> redrawBoard();
+                case "legal" -> legalMoves(params);
+                case "resign" -> resign();
+                case "leave" -> leave();
                 default -> help();
             };
         } catch (Exception ex) {
             return ex.getMessage();
         }
+    }
+
+    private String redrawBoard() {
+        return null;
     }
 
     private String create(String[] params) throws Exception {
@@ -135,6 +144,39 @@ public class ClientLoop {
         return "Observing game. Waiting for game state...";
     }
 
+    private String makeMove(String[] params) throws Exception {
+        verifyGameStatus();
+
+        if (params.length < 2 || params.length > 3) {
+            throw new Exception("Usage: move <source> <destination> [promotion]");
+        }
+
+        String source = params[0].toLowerCase();
+        String destination = params[1].toLowerCase();
+        String promotion = (params.length == 3) ? params[2].toLowerCase() : null;
+
+        // check source
+        if (!source.matches("^[a-h][1-8]$")) {
+            throw new Exception("Invalid source square: must be from a1 to h8.");
+        }
+        //check destination
+        if (!destination.matches("^[a-h][1-8]$")) {
+            throw new Exception("Invalid destination square: must be from a1 to h8.");
+        }
+        // check not equal
+        if (source.equals(destination)){
+            throw new Exception("Source and destination squares must be different.");
+        }
+        // Validate promotion if provided
+        if (promotion != null && !promotion.matches("^[qrbn]$")) {
+            throw new Exception("Invalid promotion piece. Use one of: q, r, b, n");
+        }
+
+        wsManager.makeMove(token, source, destination, promotion);
+
+        return "Move done: " + source + " → " + destination + (promotion != null ? " promoted to " + promotion.toUpperCase() : "");
+    }
+
     private String logout(String[] params) throws Exception {
         verifyPostLoginStatus();
         if(params.length != 0){
@@ -194,7 +236,7 @@ public class ClientLoop {
             return """
                     Make a move: "move" <source> <destination> <optional promotion>(e.g. f5 e4 q)
                     Redraw Board: "redraw"
-                    Change color :"colors" <color number>
+                    Legal Moves :"legal" <location>
                     Resign from game: "resign"
                     Leave game: "leave"
                     """;
