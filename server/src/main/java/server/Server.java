@@ -3,6 +3,7 @@ package server;
 import service.*;
 import dataaccess.*;
 import spark.*;
+import websocket.ServerWebSocketFacade;
 
 public class Server {
 
@@ -29,6 +30,7 @@ public class Server {
         UserService userService = new UserService(userDAO, tokenDAO);
         GameService gameService = new GameService(tokenDAO, gameDAO, userDAO);
         AuthService authService = new AuthService(tokenDAO);
+        ServerWebSocketFacade websocketHandler = new ServerWebSocketFacade(gameService, userService);
 
         // Register endpoints with appropriate handlers
         Spark.post("/user", new RegistrationHandler(userService));
@@ -38,6 +40,8 @@ public class Server {
         Spark.post("/game", new CreateGameHandler(authService, gameService));
         Spark.put("/game", new JoinGameHandler(authService, gameService));
         Spark.delete("/db", new ClearHandler(userService, gameService, authService));
+        Spark.webSocket("/ws", websocketHandler);
+
 
         // Initialize the server and wait for it to start
         Spark.init();
