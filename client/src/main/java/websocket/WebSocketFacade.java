@@ -59,6 +59,7 @@ public class WebSocketFacade extends Endpoint {
     //Endpoint requires this method, but you don't have to do anything
     @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        System.out.println("Successful connection");
     }
 
     public void joinGame(String gameId, String color, String authToken) {
@@ -78,7 +79,6 @@ public class WebSocketFacade extends Endpoint {
         // Send JSON command via WebSocket asynchronously
         this.session.getAsyncRemote().sendText(json);
     }
-
 
     public void makeMove(String token, String source, String destination, String promotion) {
         // making the chess move object to pass
@@ -124,6 +124,7 @@ public class WebSocketFacade extends Endpoint {
         String json = new Gson().toJson(command);
         this.session.getAsyncRemote().sendText(json);
     }
+
     //helping methods
     private void loadGameHandler(String message) {
     }

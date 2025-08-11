@@ -31,7 +31,8 @@ public class Server {
         GameService gameService = new GameService(tokenDAO, gameDAO, userDAO);
         AuthService authService = new AuthService(tokenDAO);
         ServerWebSocketFacade websocketHandler = new ServerWebSocketFacade(gameService, userService);
-
+        // websocket
+        Spark.webSocket("/ws", websocketHandler);
         // Register endpoints with appropriate handlers
         Spark.post("/user", new RegistrationHandler(userService));
         Spark.post("/session", new LoginHandler(userService));
@@ -40,7 +41,6 @@ public class Server {
         Spark.post("/game", new CreateGameHandler(authService, gameService));
         Spark.put("/game", new JoinGameHandler(authService, gameService));
         Spark.delete("/db", new ClearHandler(userService, gameService, authService));
-        Spark.webSocket("/ws", websocketHandler);
 
 
         // Initialize the server and wait for it to start

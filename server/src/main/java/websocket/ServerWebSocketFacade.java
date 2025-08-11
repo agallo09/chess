@@ -1,24 +1,25 @@
 package websocket;
-import dataaccess.SqlAuthTokenDao;
-import dataaccess.SqlGameDao;
-import dataaccess.SqlUserDao;
+import chess.ChessGame;
+import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import model.JoinRequest;
 import sahredWebsocket.commands.*;
 import sahredWebsocket.messages.*;
 import service.GameService;
 import service.UserService;
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
-
-public class ServerWebSocketFacade {
+@WebSocket
+public class ServerWebSocketFacade{
     //fields
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final GameService gameService;
     private final UserService userService;
+
     //constructor
     public ServerWebSocketFacade(GameService gameService, UserService userService) {
 
@@ -26,19 +27,13 @@ public class ServerWebSocketFacade {
         this.userService = userService;
     }
 
-    public void onConnect(Object session) {
-        System.out.println("New connection: " + session);
-        // Initialize session info if needed
-    }
-
-    // Called when a message is received from a client
-    @OnWebSocketMessage
-    public void onMessage(Object session, String message) {
+    // Called when  message is received from a client
+    @OnMessage
+    public void onMessage(Session session, String message) {
         try {
             UserGameCommand command = parseCommand(message);
-
             switch (command.getCommandType()) {
-                case CONNECT -> handleConnect(session, command);
+                case CONNECT -> joinHandler(session, command);
                 case MAKE_MOVE -> handleMakeMove(session, command);
                 case LEAVE -> handleLeave(session, command);
                 case RESIGN -> handleResign(session, command);
@@ -63,8 +58,19 @@ public class ServerWebSocketFacade {
 
     // --- Command Handlers ---
 
-    private void handleConnect(Object session, UserGameCommand command) {
-        // Add session info, join game, etc.
+    private void joinHandler(Session session, UserGameCommand command) throws DataAccessException, IOException {
+        Connect connectCmd = (Connect) command;
+        String token = connectCmd.getAuthToken();
+        ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(connectCmd.getColor());
+        JoinRequest joinRequest = new JoinRequest(color, connectCmd.getGameID());
+        String message = gameService.join(token, joinRequest);
+        //message for the client
+        Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        // Convert command to JSON
+        String json = new Gson().toJson(command);
+        // Send JSON command via WebSocket asynchronously
+        session.getRemote().sendString(message);
+        //
     }
 
     private void handleMakeMove(Object session, UserGameCommand command) {
@@ -86,13 +92,7 @@ public class ServerWebSocketFacade {
     // --- Helper methods ---
 
     private void sendError(Object session, String errorMsg) {
-        try {
-            ServerMessage errorMessage = new Error(errorMsg);
-            String json = serializeMessage(errorMessage);
-            sendToSession(session, json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //COMMENT
     }
 
     private String serializeMessage(ServerMessage msg) {

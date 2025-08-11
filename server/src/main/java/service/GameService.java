@@ -22,19 +22,19 @@ public class GameService {
         this.userDAO = userDAO;
     }
 
-    public GameData create( AuthData jsonHeader, GameData gameID) throws DataAccessException{
+    public GameData create( AuthData jsonHeader, GameData gameData) throws DataAccessException{
         //check if authToken exists
         Object token = tokenDAO.getAuth(jsonHeader);
         if(token == null ){
             throw new DataAccessException("Error: unauthorized");
         }
         //bad request
-        if (gameID.gameName() == null || gameID.gameName().isBlank()){
+        if (gameData.gameName() == null || gameData.gameName().isBlank()){
             throw new DataAccessException("Error: bad request");
         }
 
         //create and return game
-        return gameDAO.createGame(gameID);
+        return gameDAO.createGame(gameData);
     }
 
     public ListData list(AuthData user) throws DataAccessException {
@@ -87,10 +87,11 @@ public class GameService {
         } else {
             gameDAO.setBlackUsername(join.gameID(), username);
         }
-        return ("{}");
+        return ("Joined successfully");
     }
 
     public void clear() throws DataAccessException {
         gameDAO.clear();
     }
+
 }
