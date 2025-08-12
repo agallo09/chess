@@ -203,9 +203,6 @@ public class ServerWebSocketFacade{
         }
     }
 
-    private void handleDisconnect(Object session) {
-        // Remove session from tracking, update game state
-    }
 
     private void sendNotification(int gameID, Session joiningSession, String message) {
         Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
