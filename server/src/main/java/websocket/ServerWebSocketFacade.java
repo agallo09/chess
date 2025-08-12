@@ -56,14 +56,6 @@ public class ServerWebSocketFacade{
             sendError(session, "Error processing command: " + e.getMessage());
         }
     }
-    /*public void onClose(Object session) {
-        System.out.println("Connection closed: " + session);
-        handleDisconnect(session);
-    }
-
-    public void onError(Object session, Throwable throwable) {
-        System.err.println("Error on session " + session + ": " + throwable.getMessage());
-    }*/
 
     private void joinHandler(Session session, UserGameCommand connectCmd) throws DataAccessException, IOException {
         // Store session for the game
