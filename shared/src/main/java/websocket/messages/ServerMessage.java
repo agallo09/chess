@@ -1,6 +1,4 @@
-package sahredWebsocket.messages;
-
-import chess.ChessGame;
+package websocket.messages;
 
 import java.util.Objects;
 

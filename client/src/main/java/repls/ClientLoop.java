@@ -11,7 +11,7 @@ import static repls.State.OBSERVER;
 
 
 import ui.Board;
-import websocket.WebSocketFacade;
+import websocket.ClientWebSocketFacade;
 
 
 public class ClientLoop {
@@ -22,7 +22,7 @@ public class ClientLoop {
     private final Map<Integer,Integer> games = new HashMap<>();
     private final Board board = new Board();
     // websocket facade object
-    private WebSocketFacade wsManager;
+    private ClientWebSocketFacade wsManager;
     private websocket.NotificationHandler notificationHandler;
 
 
@@ -166,10 +166,11 @@ public class ClientLoop {
             throw new Exception("Invalid color. Must be 'white' or 'black'.");
         }
         // Use WebSocket to join the game
-        wsManager = new WebSocketFacade(serverUrl, notificationHandler);
+        wsManager = new ClientWebSocketFacade(serverUrl, notificationHandler);
+        //test if the
         wsManager.joinGame(params[0], params[1], token);
         status = State.GAMESTATUS;
-        return "Joined game as " + color + ". Waiting for game state...";
+        return "Joined game as " + color + ".";
     }
 
     private String observe(String[] params) throws Exception {
@@ -184,7 +185,7 @@ public class ClientLoop {
 
         int gameID = games.get(gameNumber);
 
-        wsManager = new WebSocketFacade(serverUrl, notificationHandler);
+        wsManager = new ClientWebSocketFacade(serverUrl, notificationHandler);
         wsManager.observeGame(params[0], token);
         status = State.OBSERVER;
         return "Observing game. Waiting for game state...";

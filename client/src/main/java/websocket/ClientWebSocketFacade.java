@@ -1,10 +1,10 @@
 package websocket;
 import chess.ChessMove;
-import chess.ChessPiece;
 import chess.ChessPiece.PieceType;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import repls.ResponseException;
+
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -12,64 +12,67 @@ import java.net.URISyntaxException;
 import sahredWebsocket.messages.*;
 import sahredWebsocket.commands.*;
 import sahredWebsocket.messages.Error;
-import com.google.gson.Gson;
+import ui.Board;
+
 
 //need to extend Endpoint for websocket to work properly
-public class WebSocketFacade extends Endpoint {
+@ClientEndpoint
+public class ClientWebSocketFacade {
 
     //fields
-    private final Session session;
-    private NotificationHandler notificationHandler;
+    Session session;
     private final Gson gson = new Gson();
     private String gameId;
     private NotificationHandler handler;
+    private Board board;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public ClientWebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            this.notificationHandler = notificationHandler;
+            this.handler = notificationHandler;
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+
             this.session = container.connectToServer(this, socketURI);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @OnMessage
+                public void onMessage(String message) {
+                    System.out.println("Received message: " + message);  // <--- Add this log
+                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                    var messageType = serverMessage.getServerMessageType();
+                    switch (messageType) {
+                        case NOTIFICATION -> {
+                            Notification notificationMessage = new Gson().fromJson(message, Notification.class);
+                            handler.notify(notificationMessage);
+                        }
+                        case ERROR -> {
+                            Error errorMessage = new Gson().fromJson(message, Error.class);
+                            handler.notify(errorMessage);
+                        }
+                        case LOAD_GAME -> {
+                            loadGameHandler(message);
+                        }
+                    }
+                }
+            });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
-    // adding message handler
-    @OnMessage
-    public void onMessage(String message) {
-        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-        var messageType = serverMessage.getServerMessageType();
-        switch (messageType) {
-            case NOTIFICATION -> {
-                Notification notificationMessage = new Gson().fromJson(message, Notification.class);
-                 handler.notify(notificationMessage);
-            }
-            case ERROR -> {
-                Error errorMessage = new Gson().fromJson(message, Error.class);
-                handler.notify(errorMessage);
-            }
-            case LOAD_GAME -> {
-                loadGameHandler(message);
-            }
-        }
-    }
-
     //Endpoint requires this method, but you don't have to do anything
     @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-        System.out.println("Successful connection");
+        System.out.println("Successful connection....");
     }
 
-    public void joinGame(String gameId, String color, String authToken) {
+    public void joinGame(String gameId, String color, String authToken) throws IOException {
         // Create a command with CONNECT type to join the game
         this.gameId = gameId;
         Connect command = new Connect(UserGameCommand.CommandType.CONNECT, authToken,Integer.parseInt(gameId), color);
         // Convert command to JSON
         String json = new Gson().toJson(command);
         // Send JSON command via WebSocket asynchronously
-        this.session.getAsyncRemote().sendText(json);
+        this.session.getBasicRemote().sendText(json);
     }
 
     public void observeGame(String gameId, String token) {
@@ -127,6 +130,14 @@ public class WebSocketFacade extends Endpoint {
 
     //helping methods
     private void loadGameHandler(String message) {
+        System.out.println("board:");
+        if (message.contains("white")){
+            board.drawWhite();
+        }else if (message.contains("black")){
+            board.drawBlack();
+        }
+        System.out.println("board drawn");
+
     }
     private ChessPosition toPosition(String pos) {
         int col = pos.charAt(0) - 'a';     // 'a'->0, 'b'->1, ..., 'h'->7

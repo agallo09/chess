@@ -8,10 +8,11 @@ import sahredWebsocket.messages.*;
 import service.GameService;
 import service.UserService;
 import java.io.IOException;
-import javax.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import java.io.IOException;
+import java.util.Timer;
 
 @WebSocket
 public class ServerWebSocketFacade{
@@ -28,7 +29,7 @@ public class ServerWebSocketFacade{
     }
 
     // Called when  message is received from a client
-    @OnMessage
+    @OnWebSocketMessage
     public void onMessage(Session session, String message) {
         try {
             UserGameCommand command = parseCommand(message);
@@ -56,8 +57,6 @@ public class ServerWebSocketFacade{
         System.err.println("Error on session " + session + ": " + throwable.getMessage());
     }
 
-    // --- Command Handlers ---
-
     private void joinHandler(Session session, UserGameCommand command) throws DataAccessException, IOException {
         Connect connectCmd = (Connect) command;
         String token = connectCmd.getAuthToken();
@@ -65,12 +64,13 @@ public class ServerWebSocketFacade{
         JoinRequest joinRequest = new JoinRequest(color, connectCmd.getGameID());
         String message = gameService.join(token, joinRequest);
         //message for the client
-        Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        LoadGame notification = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, message);
         // Convert command to JSON
-        String json = new Gson().toJson(command);
+        String json = new Gson().toJson(notification);
+
         // Send JSON command via WebSocket asynchronously
-        session.getRemote().sendString(message);
-        //
+        session.getRemote().sendString(json);
+
     }
 
     private void handleMakeMove(Object session, UserGameCommand command) {

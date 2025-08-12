@@ -1,4 +1,4 @@
-package sahredWebsocket.messages;
+package websocket.messages;
 
 public class Notification extends ServerMessage{
     private final String message;

@@ -1,4 +1,4 @@
-package sahredWebsocket.messages;
+package websocket.messages;
 
 public class Error extends ServerMessage{
     private final String errorMessage;

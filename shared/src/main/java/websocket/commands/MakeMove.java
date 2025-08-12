@@ -1,4 +1,4 @@
-package sahredWebsocket.commands;
+package websocket.commands;
 import chess.*;
 
 public class MakeMove extends UserGameCommand{

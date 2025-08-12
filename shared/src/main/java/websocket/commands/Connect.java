@@ -1,4 +1,4 @@
-package sahredWebsocket.commands;
+package websocket.commands;
 
 public class Connect extends UserGameCommand {
     private final String color;

@@ -84,10 +84,12 @@ public class GameService {
         //update game
         if (playerColor == ChessGame.TeamColor.WHITE) {
             gameDAO.setWhiteUsername(join.gameID(), username);
+            return ("Joined successfully, white");
         } else {
             gameDAO.setBlackUsername(join.gameID(), username);
+            return ("Joined successfully, black");
+
         }
-        return ("Joined successfully");
     }
 
     public void clear() throws DataAccessException {
