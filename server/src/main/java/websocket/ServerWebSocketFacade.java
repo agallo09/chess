@@ -56,15 +56,14 @@ public class ServerWebSocketFacade{
             sendError(session, "Error processing command: " + e.getMessage());
         }
     }
-
-    public void onClose(Object session) {
+    /*public void onClose(Object session) {
         System.out.println("Connection closed: " + session);
         handleDisconnect(session);
     }
 
     public void onError(Object session, Throwable throwable) {
         System.err.println("Error on session " + session + ": " + throwable.getMessage());
-    }
+    }*/
 
     private void joinHandler(Session session, UserGameCommand connectCmd) throws DataAccessException, IOException {
         // Store session for the game
@@ -164,30 +163,42 @@ public class ServerWebSocketFacade{
         }
     }
 
-    private void handleLeave(Object session, UserGameCommand command) {
-        // Handle leave
+    private void handleLeave(Session session, UserGameCommand connectCmd) throws IOException {
+        String gameID = String.valueOf(connectCmd.getGameID());
+        Set<Session> sessions = gameSessions.get(gameID);
+        if (sessions != null) {
+            sessions.remove(session);
+
+            // Notify remaining players only, exclude the leaving session
+            for (Session s : sessions) {
+                if (!s.equals(session)) {
+                    sendNotification(Integer.parseInt(gameID), s, "A player has left the game.");
+                }
+            }
+        }
     }
 
     private void handleResign(Object session, UserGameCommand command) {
         // Handle resign
     }
 
-    private void handleLegalMoves(Session session, UserGameCommand command) {
+    private void handleLegalMoves(Session session, UserGameCommand command) throws DataAccessException, IOException {
         MakeMove connectCmd = (MakeMove) command;
         //have to retrieve game from db and use the move to validate the move
         ChessMove move = connectCmd.getMove();
         //get game
-        //ChessGame game = gameService.getGame(connectCmd.getGameID());
+        GameData gamedata = gameDAO.checkGame(new JoinRequest(null, connectCmd.getGameID()));
         //validate the move
-        /*Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
-        if (validMoves.size() > 0){
+        ChessGame game = gamedata.game();
+        Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
+        if (!validMoves.isEmpty()){
             //message for the client
             Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "valid move");
             // Convert command to JSON
             String json = new Gson().toJson(notification);
             // Send JSON command via WebSocket asynchronously
             session.getRemote().sendString(json);
-        }*/
+        }
     }
 
     private void sendError(Session session, String errorMsg) {
