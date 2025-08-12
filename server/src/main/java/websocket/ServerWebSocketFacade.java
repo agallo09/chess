@@ -23,11 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebSocket
 public class ServerWebSocketFacade{
     //fields
-    private final ConnectionManager connectionManager = new ConnectionManager();
     private AuthTokenDaoInterface tokenDAO;
     private GameDaoInterface gameDAO;
     private UserDaoInterface userDAO;
-    private final Map<Integer, ConnectionManager> gameConnections = new ConcurrentHashMap<>();
     private final Map<Integer, Map<String, ChessGame.TeamColor>> gamePlayers = new ConcurrentHashMap<>();
     private final Map<Integer, Set<String>> gameObservers = new ConcurrentHashMap<>();
     private Map<Integer, Set<Session>> gameSessions = new HashMap<>();
@@ -211,24 +209,9 @@ public class ServerWebSocketFacade{
         String jsonMsg = new Gson().toJson(notif);
 
         Set<Session> sessions = gameSessions.get(gameID);
-        if (sessions == null) return;
-
-        for (Session s : sessions) {
-            if (!s.equals(joiningSession)) {
-                try {
-                    s.getRemote().sendString(jsonMsg);
-                } catch (IOException e) {
-                    System.err.println("Failed to send notification: " + e.getMessage());
-                }
-            }
+        if (sessions == null) {
+            return;
         }
-    }
-    private void sendLoadGame(int gameID, Session joiningSession, String message) {
-        Notification notif = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        String jsonMsg = new Gson().toJson(notif);
-
-        Set<Session> sessions = gameSessions.get(gameID);
-        if (sessions == null) return;
 
         for (Session s : sessions) {
             if (!s.equals(joiningSession)) {

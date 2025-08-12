@@ -145,7 +145,9 @@ public class ClientWebSocketFacade {
         return new ChessPosition(row, col);
     }
     private PieceType toPieceType(String promo) {
-        if (promo == null) return null; // no promotion
+        if (promo == null) {
+            return null;
+        } // no promotion
         switch (promo.toLowerCase()) {
             case "q": return PieceType.QUEEN;
             case "r": return PieceType.ROOK;

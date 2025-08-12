@@ -105,8 +105,8 @@ public class GameService {
     public void clear() throws DataAccessException {
         gameDAO.clear();
     }
-    public ChessGame getGame(Integer Id) throws DataAccessException {
-        return gameDAO.getChessGame(Id);
+    public ChessGame getGame(Integer id) throws DataAccessException {
+        return gameDAO.getChessGame(id);
 
     }
 

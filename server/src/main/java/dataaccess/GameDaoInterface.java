@@ -19,5 +19,5 @@ public interface GameDaoInterface {
     GameData checkGame(JoinRequest join) throws DataAccessException;
     Collection<GameData> list() throws DataAccessException;
     void clear() throws DataAccessException;
-    ChessGame getChessGame(Integer Id) throws DataAccessException;
+    ChessGame getChessGame(Integer id) throws DataAccessException;
 }

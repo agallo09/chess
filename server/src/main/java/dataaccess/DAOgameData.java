@@ -38,7 +38,7 @@ public class DAOgameData implements GameDaoInterface{
     }
 
     @Override
-    public ChessGame getChessGame(Integer Id) throws DataAccessException {
+    public ChessGame getChessGame(Integer id) throws DataAccessException {
         return null;
     }
 
