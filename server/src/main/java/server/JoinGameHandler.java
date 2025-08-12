@@ -8,14 +8,18 @@ import service.AuthService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import websocket.ServerWebSocketFacade;
+
 import java.util.Map;
 
 public class JoinGameHandler implements Route {
     private final AuthService authService;
     private final GameService gameService;
-    public JoinGameHandler(AuthService authService, GameService gameService) {
+    private ServerWebSocketFacade serverSocket;
+    public JoinGameHandler(AuthService authService, GameService gameService, ServerWebSocketFacade serverSocket) {
         this.authService = authService;
         this.gameService = gameService;
+        this.serverSocket = serverSocket;
     }
 
     @Override
@@ -29,7 +33,9 @@ public class JoinGameHandler implements Route {
             String token = request.headers("authorization");
             // service method
             String joinResult = gameService.join(token, joinRequest);
+            System.out.println(joinResult);
             // only display gameID
+            response.status(200);
             return joinResult;
         }catch(DataAccessException e) {
             String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
@@ -44,10 +50,6 @@ public class JoinGameHandler implements Route {
                 response.status(500);
             }
             return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
-        }catch (Exception e) {
-            // This catches anything unexpected (e.g., misconfigured DB)
-            response.status(500);
-            return gson.toJson(Map.of("message", "Error: internal server error"));
         }
     }
 }

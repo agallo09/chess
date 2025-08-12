@@ -30,7 +30,7 @@ public class Server {
         UserService userService = new UserService(userDAO, tokenDAO);
         GameService gameService = new GameService(tokenDAO, gameDAO, userDAO);
         AuthService authService = new AuthService(tokenDAO);
-        ServerWebSocketFacade websocketHandler = new ServerWebSocketFacade(gameService, userService);
+        ServerWebSocketFacade websocketHandler = new ServerWebSocketFacade(userDAO, tokenDAO, gameDAO);
         // websocket
         Spark.webSocket("/ws", websocketHandler);
         // Register endpoints with appropriate handlers
@@ -39,7 +39,7 @@ public class Server {
         Spark.delete("/session", new LogoutHandler(authService));
         Spark.get("/game", new ListGamesHandler(gameService));
         Spark.post("/game", new CreateGameHandler(authService, gameService));
-        Spark.put("/game", new JoinGameHandler(authService, gameService));
+        Spark.put("/game", new JoinGameHandler(authService, gameService,websocketHandler));
         Spark.delete("/db", new ClearHandler(userService, gameService, authService));
 
 

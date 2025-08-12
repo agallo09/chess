@@ -9,9 +9,9 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import sahredWebsocket.messages.*;
-import sahredWebsocket.commands.*;
-import sahredWebsocket.messages.Error;
+import websocket.messages.*;
+import websocket.commands.*;
+import websocket.messages.Error;
 import ui.Board;
 
 

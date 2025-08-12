@@ -33,6 +33,22 @@ public class SqlGameDao implements GameDaoInterface {
             throw new DataAccessException("Unable to create game", e);
         }
     }
+    @Override
+    public void updateGameState(int gameID, ChessGame game) throws DataAccessException {
+        String sql = "UPDATE Games SET game = ? WHERE id = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            Gson gson = new Gson();
+            String gameJson = gson.toJson(game);
+            stmt.setString(1, gameJson);
+            stmt.setInt(2, gameID);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to update game state", e);
+        }
+    }
 
     @Override
     public String getGame(JoinRequest join) throws DataAccessException {
@@ -179,6 +195,27 @@ public class SqlGameDao implements GameDaoInterface {
         } catch (SQLException e) {
             throw new DataAccessException("Unable to clear games", e);
         }
+    }
+
+    @Override
+    public ChessGame getChessGame(Integer id) throws DataAccessException {
+        String sql = "SELECT * FROM Games WHERE id = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1,id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String gameJson = rs.getString("game");
+                    Gson gson = new Gson();
+                    return gson.fromJson(gameJson, ChessGame.class);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to get game", e);
+        }
+        return null;
     }
 }
 

@@ -25,11 +25,23 @@ public class DAOgameData implements GameDaoInterface{
         games.put(gameId, newGame);
         return newGame;
     }
+
+    @Override
+    public void updateGameState(int gameID, ChessGame game) throws DataAccessException {
+        //comment
+    }
+
     @Override
     public void clear() {
         games.clear();
         nextId = 1;
     }
+
+    @Override
+    public ChessGame getChessGame(Integer Id) throws DataAccessException {
+        return null;
+    }
+
     @Override
     public Collection<GameData> list() {
         return games.values();

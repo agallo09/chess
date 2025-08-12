@@ -9,6 +9,9 @@ import java.util.Collection;
 
 public interface GameDaoInterface {
     GameData createGame(GameData game) throws DataAccessException;
+
+    void updateGameState(int gameID, ChessGame game) throws DataAccessException;
+
     String getGame(JoinRequest join) throws DataAccessException;
     ChessGame.TeamColor checkColor(int id, ChessGame.TeamColor color) throws DataAccessException;
     void setWhiteUsername(int gameID, String username) throws DataAccessException;
@@ -16,4 +19,5 @@ public interface GameDaoInterface {
     GameData checkGame(JoinRequest join) throws DataAccessException;
     Collection<GameData> list() throws DataAccessException;
     void clear() throws DataAccessException;
+    ChessGame getChessGame(Integer Id) throws DataAccessException;
 }

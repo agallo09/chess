@@ -1,11 +1,16 @@
 package service;
 import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
 import model.ListData;
 import model.ListDataObject;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
+import websocket.messages.ServerMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,13 +86,18 @@ public class GameService {
 
         // get the username
         String username = tokenDAO.getUsername(token);
+        //
         //update game
         if (playerColor == ChessGame.TeamColor.WHITE) {
             gameDAO.setWhiteUsername(join.gameID(), username);
-            return ("Joined successfully, white");
+            LoadGame game = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, null);
+            Gson gson = new Gson();
+            return gson.toJson(game);
         } else {
             gameDAO.setBlackUsername(join.gameID(), username);
-            return ("Joined successfully, black");
+            LoadGame game = new LoadGame(ServerMessage.ServerMessageType.LOAD_GAME, null);
+            Gson gson = new Gson();
+            return gson.toJson(game);
 
         }
     }
@@ -95,5 +105,10 @@ public class GameService {
     public void clear() throws DataAccessException {
         gameDAO.clear();
     }
+    public ChessGame getGame(Integer Id) throws DataAccessException {
+        return gameDAO.getChessGame(Id);
 
-}
+    }
+
+
+    }

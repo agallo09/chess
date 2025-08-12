@@ -1,39 +1,47 @@
 package websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
-import sahredWebsocket.messages.Notification;
+import websocket.messages.ServerMessage;
+import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    private final Map<Session, String> connections = new ConcurrentHashMap<>();
+    private final Gson gson = new Gson();
 
-    public void add(String visitorName, Session session) {
-        var connection = new Connection(visitorName, session);
-        connections.put(visitorName, connection);
+    public void addConnection(Session session, String username) {
+        connections.put(session, username);
     }
 
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public void removeConnection(Session session) {
+        connections.remove(session);
     }
 
-    public void broadcast(String excludeVisitorName, Notification notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (!c.visitorName.equals(excludeVisitorName)) {
-                    c.send(notification.toString());
+    public void broadcastToAll(ServerMessage message) {
+        String jsonMessage = gson.toJson(message);
+        connections.keySet().forEach(session -> {
+            try {
+                if (session.isOpen()) {
+                    session.getRemote().sendString(jsonMessage);
                 }
-            } else {
-                removeList.add(c);
+            } catch (IOException e) {
+                // Handle error
             }
-        }
-
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            connections.remove(c.visitorName);
-        }
+        });
+    }
+    public void broadcastToOthers(Session excludeSession, ServerMessage message) {
+        String jsonMessage = gson.toJson(message);
+        connections.keySet().stream()
+                .filter(session -> session != excludeSession && session.isOpen())
+                .forEach(session -> {
+                    try {
+                        session.getRemote().sendString(jsonMessage);
+                    } catch (IOException e) {
+                        // Handle error
+                    }
+                });
     }
 }
