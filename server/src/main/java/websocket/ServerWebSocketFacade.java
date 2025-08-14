@@ -26,11 +26,8 @@ public class ServerWebSocketFacade{
     private AuthTokenDaoInterface tokenDAO;
     private GameDaoInterface gameDAO;
     private UserDaoInterface userDAO;
-    private final Map<Integer, Map<String, ChessGame.TeamColor>> gamePlayers = new ConcurrentHashMap<>();
-    private final Map<Integer, Set<String>> gameObservers = new ConcurrentHashMap<>();
-    private Map<Integer, Set<Session>> gameSessions = new HashMap<>();
-    Map<String, String> resultsJoin = new HashMap<>();
-    String state;
+    private final Map<Integer, Set<Session>> gameSessions = new HashMap<>();
+    private final List<Integer> resignedGames = new ArrayList<>();
 
     //constructor
     public ServerWebSocketFacade(UserDaoInterface userDAO,AuthTokenDaoInterface tokenDAO,GameDaoInterface gameDAO) {
@@ -103,7 +100,13 @@ public class ServerWebSocketFacade{
         GameData game1 = gameDAO.checkGame(new JoinRequest(null, gameData.gameID()));
         String whiteUser = game1.whiteUsername();
         String blackUser = game1.blackUsername();
+        //error game already resigned
 
+        if ( resignedGames.contains(move1.getGameID())) {
+            sendError(session, "A player resigned already.");
+            return;
+        }
+        //error not your turn
         if ( (color == TeamColor.WHITE && !username.equals(whiteUser)) ||
                 (color == TeamColor.BLACK && !username.equals(blackUser)) ) {
             sendError(session, "It's not your turn");
@@ -155,23 +158,74 @@ public class ServerWebSocketFacade{
         }
     }
 
-    private void handleLeave(Session session, UserGameCommand connectCmd) throws IOException {
-        String gameID = String.valueOf(connectCmd.getGameID());
-        Set<Session> sessions = gameSessions.get(gameID);
+    private void handleLeave(Session session, UserGameCommand connectCmd) throws IOException, DataAccessException {
+        // 2 things have to be made: first eliminate the player from database and send a notification to all the people in the game
+        // first eliminate the player from the database
+        // second update the hashmap
+        // third, send a notification to all sessions left
+
+        //getting player info from database
+        String token = connectCmd.getAuthToken();
+        String username = tokenDAO.getUsername(token);
+        GameData game1 = gameDAO.checkGame(new JoinRequest(null, connectCmd.getGameID()));
+        String whiteUsername = game1.whiteUsername();
+        String blackUsername = game1.blackUsername();
+
+        if (username.equals(whiteUsername)) {
+            // eliminate from database
+
+            gameDAO.setWhiteUsername(connectCmd.getGameID(),null);
+            // updating map and sending notifications
+        }else if(username.equals(blackUsername)){
+            // eliminate from database
+
+            gameDAO.setBlackUsername(connectCmd.getGameID(),null);
+            // updating map and sending notifications
+        }
+        Set<Session> sessions = gameSessions.get(connectCmd.getGameID());
         if (sessions != null) {
             sessions.remove(session);
-
-            // Notify remaining players only, exclude the leaving session
-            for (Session s : sessions) {
-                if (!s.equals(session)) {
-                    sendNotification(Integer.parseInt(gameID), s, "A player has left the game.");
-                }
-            }
         }
+        // Notify remaining players only, exclude the leaving session
+        sendNotification(connectCmd.getGameID(), session, "A player has left the game.");
+
     }
 
-    private void handleResign(Object session, UserGameCommand command) {
-        // Handle resign
+    private void handleResign(Session session, UserGameCommand command) throws DataAccessException {
+        // first mark game es over is not allowing more moves only, so I can still leave or see legal moves
+        //update in database
+        //send notification informing the resigned
+        // update make move, to check for the status that this handler will create in the table
+        if (resignedGames.contains(command.getGameID())) {
+            sendError(session, "Game already resigned.");
+            return;
+        }
+        resignedGames.add(command.getGameID());
+        String token = command.getAuthToken();
+        String username = tokenDAO.getUsername(token);
+        String message = "Player has resigned: " + username;
+
+        // check if the username is a player
+        GameData game = gameDAO.checkGame(new JoinRequest(null, command.getGameID()));
+        String whiteUser = game.whiteUsername();
+        String blackUser = game.blackUsername();
+        // If not a player, send error and stop
+        if (!username.equals(whiteUser) && !username.equals(blackUser)) {
+            sendError(session, "Only players can resign a game.");
+            return;
+        }
+        //sending notification to all
+        Notification notificationToAll = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        String jsonMsg = new Gson().toJson(notificationToAll);
+        Set<Session> sessions = gameSessions.get(command.getGameID());
+
+        for (Session s : sessions) {
+                try {
+                    s.getRemote().sendString(jsonMsg);
+                } catch (IOException e) {
+                    System.err.println("Failed to send notification: " + e.getMessage());
+                }
+            }
     }
 
     private void handleLegalMoves(Session session, UserGameCommand command) throws DataAccessException, IOException {
@@ -223,6 +277,7 @@ public class ServerWebSocketFacade{
             }
         }
     }
+
 
 
 }
